@@ -1,0 +1,6233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Urban Legends - Open World</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html,
+body{
+
+    width:100%;
+    height:100%;
+
+    overflow:hidden;
+
+    background:#050505;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+}
+
+canvas{
+
+    display:block;
+
+}
+
+#gameUI{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    pointer-events:none;
+
+    z-index:20;
+
+}
+
+#money{
+
+    position:absolute;
+
+    top:22px;
+    right:28px;
+
+    color:#65ff85;
+
+    font-size:25px;
+
+    font-weight:bold;
+
+    text-shadow:
+        2px 2px 4px #000;
+
+}
+
+#healthBox{
+
+    position:absolute;
+
+    left:25px;
+    bottom:28px;
+
+    width:230px;
+
+    height:24px;
+
+    background:
+        rgba(0,0,0,.65);
+
+    border:
+        2px solid rgba(255,255,255,.4);
+
+    border-radius:5px;
+
+    overflow:hidden;
+
+}
+
+#health{
+
+    width:100%;
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #d71919,
+            #ff4747
+        );
+
+}
+
+#ammo{
+
+    position:absolute;
+
+    right:28px;
+    bottom:32px;
+
+    color:white;
+
+    font-size:20px;
+
+    text-shadow:
+        2px 2px 4px #000;
+
+}
+
+#wanted{
+
+    position:absolute;
+
+    top:62px;
+    right:28px;
+
+    color:white;
+
+    font-size:25px;
+
+    letter-spacing:3px;
+
+    text-shadow:
+        2px 2px 4px #000;
+
+}
+
+#message{
+
+    position:absolute;
+
+    left:50%;
+    bottom:105px;
+
+    transform:
+        translateX(-50%);
+
+    color:white;
+
+    font-size:18px;
+
+    padding:
+        12px 22px;
+
+    background:
+        rgba(0,0,0,.72);
+
+    border-radius:7px;
+
+    opacity:0;
+
+    transition:
+        opacity .2s;
+
+}
+
+#crosshair{
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    width:10px;
+    height:10px;
+
+    transform:
+        translate(-50%,-50%);
+
+    border:
+        2px solid white;
+
+    border-radius:50%;
+
+    opacity:.75;
+
+}
+
+#location{
+
+    position:absolute;
+
+    left:28px;
+    top:25px;
+
+    color:white;
+
+    font-size:20px;
+
+    font-weight:bold;
+
+    text-shadow:
+        2px 2px 5px #000;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<div id="gameUI">
+
+    <div id="location">
+        DOWNTOWN
+    </div>
+
+    <div id="money">
+        $10,000
+    </div>
+
+    <div id="wanted">
+        ☆☆☆☆☆
+    </div>
+
+    <div id="healthBox">
+
+        <div id="health"></div>
+
+    </div>
+
+    <div id="ammo">
+        30 / 120
+    </div>
+
+    <div id="crosshair"></div>
+
+    <div id="message"></div>
+
+</div>
+
+
+<script src=
+"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js">
+</script>
+
+
+<script>
+
+
+/* ==================================================
+   GAME CORE
+================================================== */
+
+let scene;
+
+let camera;
+
+let renderer;
+
+let clock;
+
+let gameStarted=true;
+
+let playerGroup;
+
+let car;
+
+let inCar=false;
+
+let money=10000;
+
+let playerHealth=100;
+
+let reserveAmmo=120;
+
+let carSpeed=0;
+
+let WORLD_SIZE=1800;
+
+
+/* ==================================================
+   THREE.JS INITIALIZATION
+================================================== */
+
+scene =
+    new THREE.Scene();
+
+
+scene.background =
+    new THREE.Color(
+        0x87a9c4
+    );
+
+
+scene.fog =
+    new THREE.Fog(
+        0x87a9c4,
+        300,
+        1700
+    );
+
+
+camera =
+    new THREE.PerspectiveCamera(
+
+        65,
+
+        window.innerWidth /
+        window.innerHeight,
+
+        .1,
+
+        3000
+
+    );
+
+
+camera.position.set(
+    0,
+    7,
+    12
+);
+
+
+renderer =
+    new THREE.WebGLRenderer({
+
+        antialias:true
+
+    });
+
+
+renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+);
+
+
+renderer.setPixelRatio(
+    Math.min(
+        window.devicePixelRatio,
+        2
+    )
+);
+
+
+renderer.shadowMap.enabled=true;
+
+
+renderer.shadowMap.type =
+    THREE.PCFSoftShadowMap;
+
+
+renderer.outputColorSpace =
+    THREE.SRGBColorSpace;
+
+
+renderer.toneMapping =
+    THREE.ACESFilmicToneMapping;
+
+
+renderer.toneMappingExposure =
+    1.15;
+
+
+document.body.appendChild(
+    renderer.domElement
+);
+
+
+clock =
+    new THREE.Clock();
+
+
+/* ==================================================
+   LIGHTING
+================================================== */
+
+const ambientLight =
+    new THREE.HemisphereLight(
+
+        0x9db8d0,
+
+        0x25251f,
+
+        1.25
+
+    );
+
+
+scene.add(
+    ambientLight
+);
+
+
+const sun =
+    new THREE.DirectionalLight(
+
+        0xfff0d0,
+
+        2.4
+
+    );
+
+
+sun.position.set(
+    -400,
+    700,
+    -350
+);
+
+
+sun.castShadow=true;
+
+
+sun.shadow.mapSize.width=
+    2048;
+
+
+sun.shadow.mapSize.height=
+    2048;
+
+
+sun.shadow.camera.left=
+    -1000;
+
+
+sun.shadow.camera.right=
+    1000;
+
+
+sun.shadow.camera.top=
+    1000;
+
+
+sun.shadow.camera.bottom=
+    -1000;
+
+
+scene.add(
+    sun
+);
+
+
+/* ==================================================
+   MATERIALS
+================================================== */
+
+function material(
+    color,
+    roughness=.8,
+    metalness=.05
+){
+
+    return new THREE.MeshStandardMaterial({
+
+        color:color,
+
+        roughness:roughness,
+
+        metalness:metalness
+
+    });
+
+}
+
+
+const asphalt =
+    material(
+        0x25282b,
+        .95
+    );
+
+
+const sidewalkMaterial =
+    material(
+        0x8b8b84,
+        .95
+    );
+
+
+const whiteMaterial =
+    material(
+        0xf2f2f2,
+        .7
+    );
+
+
+const yellowMaterial =
+    material(
+        0xe6bd39,
+        .7
+    );
+
+
+const glassMaterial =
+    new THREE.MeshStandardMaterial({
+
+        color:0x294b5d,
+
+        roughness:.18,
+
+        metalness:.4,
+
+        transparent:true,
+
+        opacity:.82
+
+    });
+
+
+const windowLight =
+    new THREE.MeshStandardMaterial({
+
+        color:0xffd98a,
+
+        emissive:0xff9c27,
+
+        emissiveIntensity:.7
+
+    });
+
+
+/* ==================================================
+   CITY ARRAYS
+================================================== */
+
+let cityBuildings=[];
+
+let cityRoads=[];
+
+let sidewalks=[];
+
+let streetLights=[];
+
+let trees=[];
+
+let roadLines=[];
+
+let citySigns=[];
+
+
+/* ==================================================
+   BASIC OBJECT CREATOR
+================================================== */
+
+function createBox(
+    width,
+    height,
+    depth,
+    mat
+){
+
+    const object =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+
+                width,
+                height,
+                depth
+
+            ),
+
+            mat
+
+        );
+
+
+    object.castShadow=true;
+
+    object.receiveShadow=true;
+
+
+    return object;
+
+}
+
+
+/* ==================================================
+   ROAD
+================================================== */
+
+function createRoad(
+    x,
+    z,
+    width,
+    depth
+){
+
+    const road =
+        createBox(
+
+            width,
+            .12,
+            depth,
+
+            asphalt
+
+        );
+
+
+    road.position.set(
+        x,
+        .05,
+        z
+    );
+
+
+    scene.add(
+        road
+    );
+
+
+    cityRoads.push(
+        road
+    );
+
+}
+
+
+/* ==================================================
+   SIDEWALK
+================================================== */
+
+function createSidewalk(
+    x,
+    z,
+    width,
+    depth
+){
+
+    const sidewalk =
+        createBox(
+
+            width,
+            .25,
+            depth,
+
+            sidewalkMaterial
+
+        );
+
+
+    sidewalk.position.set(
+        x,
+        .12,
+        z
+    );
+
+
+    scene.add(
+        sidewalk
+    );
+
+
+    sidewalks.push(
+        sidewalk
+    );
+
+}
+
+
+/* ==================================================
+   ROAD LANE MARKING
+================================================== */
+
+function createLaneLine(
+    x,
+    z,
+    width,
+    depth
+){
+
+    const line =
+        createBox(
+
+            width,
+            .035,
+            depth,
+
+            whiteMaterial
+
+        );
+
+
+    line.position.set(
+        x,
+        .13,
+        z
+    );
+
+
+    scene.add(
+        line
+    );
+
+
+    roadLines.push(
+        line
+    );
+
+}
+
+
+/* ==================================================
+   CROSSWALK
+================================================== */
+
+function createCrosswalk(
+    x,
+    z,
+    horizontal=true
+){
+
+    for(
+        let i=-4;
+        i<=4;
+        i++
+    ){
+
+        let stripe;
+
+
+        if(horizontal){
+
+            stripe =
+                createBox(
+
+                    4,
+                    .04,
+                    1.5,
+
+                    whiteMaterial
+
+                );
+
+
+            stripe.position.set(
+                x+i*5,
+                .16,
+                z
+            );
+
+        }
+        else{
+
+            stripe =
+                createBox(
+
+                    1.5,
+                    .04,
+                    4,
+
+                    whiteMaterial
+
+                );
+
+
+            stripe.position.set(
+                x,
+                .16,
+                z+i*5
+            );
+
+        }
+
+
+        scene.add(
+            stripe
+        );
+
+
+        roadLines.push(
+            stripe
+        );
+
+    }
+
+}
+
+
+/* ==================================================
+   CITY ROAD GRID
+================================================== */
+
+function createRoadGrid(){
+
+    for(
+        let p=-750;
+        p<=750;
+        p+=300
+    ){
+
+        createRoad(
+            p,
+            0,
+            55,
+            WORLD_SIZE
+        );
+
+
+        createRoad(
+            0,
+            p,
+            WORLD_SIZE,
+            55
+        );
+
+
+        createSidewalk(
+            p-38,
+            0,
+            16,
+            WORLD_SIZE
+        );
+
+
+        createSidewalk(
+            p+38,
+            0,
+            16,
+            WORLD_SIZE
+        );
+
+
+        createSidewalk(
+            0,
+            p-38,
+            WORLD_SIZE,
+            16
+        );
+
+
+        createSidewalk(
+            0,
+            p+38,
+            WORLD_SIZE,
+            16
+        );
+
+
+        for(
+            let line=-850;
+            line<850;
+            line+=24
+        ){
+
+            createLaneLine(
+                p,
+                line,
+                1.2,
+                11
+            );
+
+
+            createLaneLine(
+                line,
+                p,
+                11,
+                1.2
+            );
+
+        }
+
+
+        createCrosswalk(
+            p,
+            32,
+            true
+        );
+
+
+        createCrosswalk(
+            p,
+            -32,
+            true
+        );
+
+
+        createCrosswalk(
+            32,
+            p,
+            false
+        );
+
+
+        createCrosswalk(
+            -32,
+            p,
+            false
+        );
+
+    }
+
+}
+
+
+/* ==================================================
+   BUILDING
+================================================== */
+
+function createBuilding(
+    x,
+    z,
+    width,
+    depth,
+    height
+){
+
+    const group =
+        new THREE.Group();
+
+
+    const colors=[
+
+        0x72777b,
+        0x8b8177,
+        0x656d72,
+        0x9a8e80,
+        0x566067,
+        0x817c75,
+        0x4f5559,
+        0xa09488
+
+    ];
+
+
+    const color =
+        colors[
+            Math.floor(
+                Math.random()*
+                colors.length
+            )
+        ];
+
+
+    const body =
+        createBox(
+
+            width,
+            height,
+            depth,
+
+            material(
+                color,
+                .85
+            )
+
+        );
+
+
+    body.position.y=
+        height/2;
+
+
+    group.add(
+        body
+    );
+
+
+    /* WINDOWS FRONT/BACK */
+
+    const rows =
+        Math.max(
+            2,
+            Math.floor(
+                height/4
+            )
+        );
+
+
+    const columns =
+        Math.max(
+            2,
+            Math.floor(
+                width/5
+            )
+        );
+
+
+    for(
+        let row=0;
+        row<rows;
+        row++
+    ){
+
+        for(
+            let col=0;
+            col<columns;
+            col++
+        ){
+
+            const window =
+                new THREE.Mesh(
+
+                    new THREE.BoxGeometry(
+                        1.8,
+                        2,
+                        .08
+                    ),
+
+                    Math.random()<.28
+                    ? windowLight
+                    : glassMaterial
+
+                );
+
+
+            const spacing =
+                width/
+                (columns+1);
+
+
+            window.position.set(
+
+                -width/2+
+                spacing*(col+1),
+
+                3+
+                row*4,
+
+                -depth/2-.06
+
+            );
+
+
+            group.add(
+                window
+            );
+
+
+            const rear =
+                window.clone();
+
+
+            rear.position.z=
+                depth/2+.06;
+
+
+            group.add(
+                rear
+            );
+
+        }
+
+    }
+
+
+    /* SIDE WINDOWS */
+
+    const sideColumns =
+        Math.max(
+            2,
+            Math.floor(
+                depth/5
+            )
+        );
+
+
+    for(
+        let row=0;
+        row<rows;
+        row++
+    ){
+
+        for(
+            let col=0;
+            col<sideColumns;
+            col++
+        ){
+
+            const sideWindow =
+                new THREE.Mesh(
+
+                    new THREE.BoxGeometry(
+                        .08,
+                        2,
+                        1.7
+                    ),
+
+                    glassMaterial
+
+                );
+
+
+            const spacing =
+                depth/
+                (sideColumns+1);
+
+
+            sideWindow.position.set(
+
+                -width/2-.06,
+
+                3+
+                row*4,
+
+                -depth/2+
+                spacing*(col+1)
+
+            );
+
+
+            group.add(
+                sideWindow
+            );
+
+
+            const other =
+                sideWindow.clone();
+
+
+            other.position.x=
+                width/2+.06;
+
+
+            group.add(
+                other
+            );
+
+        }
+
+    }
+
+
+    /* ROOF */
+
+    const roof =
+        createBox(
+
+            width+.8,
+            .6,
+            depth+.8,
+
+            material(
+                0x343638
+            )
+
+        );
+
+
+    roof.position.y=
+        height+.3;
+
+
+    group.add(
+        roof
+    );
+
+
+    /* GROUND BASE */
+
+    const base =
+        createBox(
+
+            width+1,
+            .7,
+            depth+1,
+
+            material(
+                0x3d3f40
+            )
+
+        );
+
+
+    base.position.y=
+        .35;
+
+
+    group.add(
+        base
+    );
+
+
+    group.position.set(
+        x,
+        0,
+        z
+    );
+
+
+    scene.add(
+        group
+    );
+
+
+    cityBuildings.push(
+        group
+    );
+
+
+    return group;
+
+}
+
+
+/* ==================================================
+   SKYSCRAPER
+================================================== */
+
+function createSkyscraper(
+    x,
+    z,
+    width,
+    depth,
+    height
+){
+
+    const tower =
+        createBuilding(
+            x,
+            z,
+            width,
+            depth,
+            height
+        );
+
+
+    tower.userData.skyscraper=true;
+
+
+    return tower;
+
+}
+
+
+/* ==================================================
+   CITY BLOCK
+================================================== */
+
+function createCityBlock(
+    x,
+    z
+){
+
+    createBuilding(
+        x-70,
+        z-65,
+        55+
+        Math.random()*25,
+        50+
+        Math.random()*25,
+        25+
+        Math.random()*65
+    );
+
+
+    createBuilding(
+        x+65,
+        z-65,
+        55+
+        Math.random()*25,
+        50+
+        Math.random()*25,
+        25+
+        Math.random()*80
+    );
+
+
+    createBuilding(
+        x-70,
+        z+65,
+        55+
+        Math.random()*25,
+        50+
+        Math.random()*25,
+        25+
+        Math.random()*60
+    );
+
+
+    createBuilding(
+        x+65,
+        z+65,
+        55+
+        Math.random()*25,
+        50+
+        Math.random()*25,
+        25+
+        Math.random()*70
+    );
+
+}
+
+
+/* ==================================================
+   CITY DISTRICTS
+================================================== */
+
+function createCity(){
+
+    createRoadGrid();
+
+
+    for(
+        let x=-450;
+        x<=450;
+        x+=300
+    ){
+
+        for(
+            let z=-450;
+            z<=450;
+            z+=300
+        ){
+
+            createCityBlock(
+                x,
+                z
+            );
+
+        }
+
+    }
+
+
+    /* CENTRAL TOWERS */
+
+    createSkyscraper(
+        -110,
+        -110,
+        72,
+        72,
+        145
+    );
+
+
+    createSkyscraper(
+        110,
+        110,
+        65,
+        65,
+        125
+    );
+
+
+    createSkyscraper(
+        -110,
+        200,
+        70,
+        70,
+        110
+    );
+
+
+    createSkyscraper(
+        250,
+        -110,
+        78,
+        70,
+        135
+    );
+
+}
+
+
+/* ==================================================
+   TREE
+================================================== */
+
+function createTree(
+    x,
+    z,
+    scale=1
+){
+
+    const group =
+        new THREE.Group();
+
+
+    const trunk =
+        new THREE.Mesh(
+
+            new THREE.CylinderGeometry(
+                .35*scale,
+                .5*scale,
+                4*scale,
+                8
+            ),
+
+            material(
+                0x593722
+            )
+
+        );
+
+
+    trunk.position.y=
+        2*scale;
+
+
+    trunk.castShadow=true;
+
+
+    group.add(
+        trunk
+    );
+
+
+    const leaves =
+        new THREE.Mesh(
+
+            new THREE.SphereGeometry(
+                2.3*scale,
+                14,
+                14
+            ),
+
+            material(
+                0x28663b
+            )
+
+        );
+
+
+    leaves.position.y=
+        5*scale;
+
+
+    leaves.castShadow=true;
+
+
+    group.add(
+        leaves
+    );
+
+
+    const topLeaves =
+        new THREE.Mesh(
+
+            new THREE.SphereGeometry(
+                1.6*scale,
+                12,
+                12
+            ),
+
+            material(
+                0x347d46
+            )
+
+        );
+
+
+    topLeaves.position.y=
+        6.5*scale;
+
+
+    topLeaves.castShadow=true;
+
+
+    group.add(
+        topLeaves
+    );
+
+
+    group.position.set(
+        x,
+        0,
+        z
+    );
+
+
+    scene.add(
+        group
+    );
+
+
+    trees.push(
+        group
+    );
+
+}
+
+
+/* ==================================================
+   PARK
+================================================== */
+
+function createPark(
+    x,
+    z,
+    width,
+    depth
+){
+
+    const grass =
+        createBox(
+
+            width,
+            .15,
+            depth,
+
+            material(
+                0x2d713d
+            )
+
+        );
+
+
+    grass.position.set(
+        x,
+        .075,
+        z
+    );
+
+
+    scene.add(
+        grass
+    );
+
+
+    for(
+        let i=0;
+        i<22;
+        i++
+    ){
+
+        createTree(
+
+            x-
+            width/2+
+            15+
+            Math.random()*
+            (width-30),
+
+            z-
+            depth/2+
+            15+
+            Math.random()*
+            (depth-30),
+
+            .7+
+            Math.random()*.7
+
+        );
+
+    }
+
+}
+
+
+/* ==================================================
+   STREET LIGHT
+================================================== */
+
+function createStreetLight(
+    x,
+    z,
+    rotation=0
+){
+
+    const group =
+        new THREE.Group();
+
+
+    const pole =
+        new THREE.Mesh(
+
+            new THREE.CylinderGeometry(
+                .16,
+                .24,
+                9,
+                10
+            ),
+
+            material(
+                0x202020,
+                .45
+            )
+
+        );
+
+
+    pole.position.y=
+        4.5;
+
+
+    group.add(
+        pole
+    );
+
+
+    const arm =
+        createBox(
+
+            2.8,
+            .18,
+            .18,
+
+            material(
+                0x202020
+            )
+
+        );
+
+
+    arm.position.set(
+        1.25,
+        8.65,
+        0
+    );
+
+
+    group.add(
+        arm
+    );
+
+
+    const lamp =
+        new THREE.Mesh(
+
+            new THREE.SphereGeometry(
+                .35,
+                12,
+                12
+            ),
+
+            new THREE.MeshStandardMaterial({
+
+                color:0xffe3a0,
+
+                emissive:0xffa42e,
+
+                emissiveIntensity:2
+
+            })
+
+        );
+
+
+    lamp.position.set(
+        2.55,
+        8.45,
+        0
+    );
+
+
+    group.add(
+        lamp
+    );
+
+
+    const pointLight =
+        new THREE.PointLight(
+            0xffbd69,
+            1.15,
+            35
+        );
+
+
+    pointLight.position.copy(
+        lamp.position
+    );
+
+
+    group.add(
+        pointLight
+    );
+
+
+    group.position.set(
+        x,
+        0,
+        z
+    );
+
+
+    group.rotation.y=
+        rotation;
+
+
+    scene.add(
+        group
+    );
+
+
+    streetLights.push(
+        group
+    );
+
+}
+
+
+/* ==================================================
+   STREET LIGHT GRID
+================================================== */
+
+function createStreetLights(){
+
+    for(
+        let p=-750;
+        p<=750;
+        p+=100
+    ){
+
+        createStreetLight(
+            p,
+            -45,
+            0
+        );
+
+
+        createStreetLight(
+            p,
+            45,
+            Math.PI
+        );
+
+
+        createStreetLight(
+            -45,
+            p,
+            Math.PI/2
+        );
+
+
+        createStreetLight(
+            45,
+            p,
+            -Math.PI/2
+        );
+
+    }
+
+}
+
+
+/* ==================================================
+   DISTRICT LABEL
+================================================== */
+
+function createDistrictLabel(
+    text,
+    x,
+    z
+){
+
+    const canvas =
+        document.createElement(
+            "canvas"
+        );
+
+
+    canvas.width=1000;
+
+    canvas.height=220;
+
+
+    const ctx =
+        canvas.getContext(
+            "2d"
+        );
+
+
+    ctx.textAlign=
+        "center";
+
+
+    ctx.textBaseline=
+        "middle";
+
+
+    ctx.font=
+        "bold 82px Arial";
+
+
+    ctx.fillStyle=
+        "white";
+
+
+    ctx.strokeStyle=
+        "black";
+
+
+    ctx.lineWidth=
+        12;
+
+
+    ctx.strokeText(
+        text,
+        500,
+        110
+    );
+
+
+    ctx.fillText(
+        text,
+        500,
+        110
+    );
+
+
+    const texture =
+        new THREE.CanvasTexture(
+            canvas
+        );
+
+
+    const sprite =
+        new THREE.Sprite(
+
+            new THREE.SpriteMaterial({
+
+                map:texture,
+
+                transparent:true
+
+            })
+
+        );
+
+
+    sprite.position.set(
+        x,
+        38,
+        z
+    );
+
+
+    sprite.scale.set(
+        75,
+        16,
+        1
+    );
+
+
+    scene.add(
+        sprite
+    );
+
+
+    citySigns.push(
+        sprite
+    );
+
+}
+
+
+/* ==================================================
+   DISTRICT NAMES
+================================================== */
+
+function createDistricts(){
+
+    createDistrictLabel(
+        "DOWNTOWN",
+        0,
+        0
+    );
+
+
+    createDistrictLabel(
+        "WESTSIDE",
+        -600,
+        0
+    );
+
+
+    createDistrictLabel(
+        "EASTSIDE",
+        600,
+        0
+    );
+
+
+    createDistrictLabel(
+        "NORTH HILLS",
+        0,
+        -600
+    );
+
+
+    createDistrictLabel(
+        "SOUTH DISTRICT",
+        0,
+        600
+    );
+
+
+    createPark(
+        -600,
+        -600,
+        180,
+        180
+    );
+
+
+    createPark(
+        600,
+        -600,
+        180,
+        180
+    );
+
+
+    createPark(
+        -600,
+        600,
+        180,
+        180
+    );
+
+
+    createPark(
+        600,
+        600,
+        180,
+        180
+    );
+
+}
+
+
+/* ==================================================
+   START CITY
+================================================== */
+
+createCity();
+
+createStreetLights();
+
+createDistricts();
+
+
+/* ==================================================
+   RESIZE
+================================================== */
+
+window.addEventListener(
+    "resize",
+    function(){
+
+        camera.aspect =
+            window.innerWidth /
+            window.innerHeight;
+
+
+        camera.updateProjectionMatrix();
+
+
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+        );
+
+    }
+);
+/* ==================================================
+   STAGE 9 — PART 2/3
+   VEHICLES + PLAYER + TRAFFIC + SHOPS
+   CONTINUES DIRECTLY FROM PART 1
+================================================== */
+
+
+/* ==================================================
+   VEHICLE SYSTEM
+================================================== */
+
+let trafficCars = [];
+
+let playerVehicles = [];
+
+let vehicleSpawnTimer = 0;
+
+
+/* ==================================================
+   VEHICLE MATERIALS
+================================================== */
+
+const carColors = [
+
+    0xc62828,
+    0x1565c0,
+    0xf5f5f5,
+    0x171717,
+    0xf0b429,
+    0x2e7d32,
+    0x7b1fa2,
+    0xef6c00,
+    0x37474f,
+    0xbdbdbd
+
+];
+
+
+const tireMaterial =
+    new THREE.MeshStandardMaterial({
+
+        color:0x111111,
+
+        roughness:.9
+
+    });
+
+
+const chromeMaterial =
+    new THREE.MeshStandardMaterial({
+
+        color:0xbfc5c9,
+
+        metalness:.8,
+
+        roughness:.25
+
+    });
+
+
+const darkGlass =
+    new THREE.MeshStandardMaterial({
+
+        color:0x182d38,
+
+        metalness:.25,
+
+        roughness:.18,
+
+        transparent:true,
+
+        opacity:.86
+
+    });
+
+
+const headLightMaterial =
+    new THREE.MeshStandardMaterial({
+
+        color:0xffffff,
+
+        emissive:0xffffff,
+
+        emissiveIntensity:2
+
+    });
+
+
+const tailLightMaterial =
+    new THREE.MeshStandardMaterial({
+
+        color:0xff1717,
+
+        emissive:0xff0000,
+
+        emissiveIntensity:1.8
+
+    });
+
+
+/* ==================================================
+   CREATE REALISTIC-STYLE CAR
+================================================== */
+
+function createDetailedCar(
+    color=null
+){
+
+    const carGroup =
+        new THREE.Group();
+
+
+    const bodyColor =
+        color ||
+        carColors[
+            Math.floor(
+                Math.random()*
+                carColors.length
+            )
+        ];
+
+
+    /* ==================================================
+       MAIN BODY
+    ================================================== */
+
+    const lowerBody =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                4.4,
+                1.15,
+                8.2
+            ),
+
+            material(
+                bodyColor,
+                .45,
+                .18
+            )
+
+        );
+
+
+    lowerBody.position.y=
+        1.05;
+
+
+    lowerBody.castShadow=true;
+
+    lowerBody.receiveShadow=true;
+
+
+    carGroup.add(
+        lowerBody
+    );
+
+
+    /* ==================================================
+       HOOD
+    ================================================== */
+
+    const hood =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                4.05,
+                .42,
+                2.15
+            ),
+
+            material(
+                bodyColor,
+                .4,
+                .18
+            )
+
+        );
+
+
+    hood.position.set(
+        0,
+        1.68,
+        -2.55
+    );
+
+
+    hood.castShadow=true;
+
+
+    carGroup.add(
+        hood
+    );
+
+
+    /* ==================================================
+       REAR
+    ================================================== */
+
+    const trunk =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                4.05,
+                .48,
+                1.7
+            ),
+
+            material(
+                bodyColor,
+                .4,
+                .18
+            )
+
+        );
+
+
+    trunk.position.set(
+        0,
+        1.55,
+        2.75
+    );
+
+
+    carGroup.add(
+        trunk
+    );
+
+
+    /* ==================================================
+       ROOF / CABIN
+    ================================================== */
+
+    const cabin =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                3.65,
+                1.75,
+                4.1
+            ),
+
+            material(
+                bodyColor,
+                .45,
+                .15
+            )
+
+        );
+
+
+    cabin.position.set(
+        0,
+        2.35,
+        .35
+    );
+
+
+    cabin.castShadow=true;
+
+
+    carGroup.add(
+        cabin
+    );
+
+
+    /* ==================================================
+       FRONT WINDSHIELD
+    ================================================== */
+
+    const frontGlass =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                3.15,
+                1.25,
+                .08
+            ),
+
+            darkGlass
+
+        );
+
+
+    frontGlass.position.set(
+        0,
+        2.48,
+        -1.72
+    );
+
+
+    frontGlass.rotation.x=
+        -.13;
+
+
+    carGroup.add(
+        frontGlass
+    );
+
+
+    /* ==================================================
+       REAR WINDOW
+    ================================================== */
+
+    const rearGlass =
+        frontGlass.clone();
+
+
+    rearGlass.position.z=
+        2.42;
+
+
+    rearGlass.rotation.x=
+        .13;
+
+
+    carGroup.add(
+        rearGlass
+    );
+
+
+    /* ==================================================
+       SIDE WINDOWS
+    ================================================== */
+
+    const sideWindowShape =
+        new THREE.BoxGeometry(
+            .08,
+            1.15,
+            1.55
+        );
+
+
+    const leftWindow =
+        new THREE.Mesh(
+            sideWindowShape,
+            darkGlass
+        );
+
+
+    leftWindow.position.set(
+        -1.84,
+        2.45,
+        -.55
+    );
+
+
+    carGroup.add(
+        leftWindow
+    );
+
+
+    const leftRearWindow =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                .08,
+                1.15,
+                1.25
+            ),
+            darkGlass
+        );
+
+
+    leftRearWindow.position.set(
+        -1.84,
+        2.45,
+        1.25
+    );
+
+
+    carGroup.add(
+        leftRearWindow
+    );
+
+
+    const rightWindow =
+        leftWindow.clone();
+
+
+    rightWindow.position.x=
+        1.84;
+
+
+    carGroup.add(
+        rightWindow
+    );
+
+
+    const rightRearWindow =
+        leftRearWindow.clone();
+
+
+    rightRearWindow.position.x=
+        1.84;
+
+
+    carGroup.add(
+        rightRearWindow
+    );
+
+
+    /* ==================================================
+       BUMPERS
+    ================================================== */
+
+    const frontBumper =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                4.15,
+                .35,
+                .35
+            ),
+
+            chromeMaterial
+
+        );
+
+
+    frontBumper.position.set(
+        0,
+        .72,
+        -4.12
+    );
+
+
+    carGroup.add(
+        frontBumper
+    );
+
+
+    const rearBumper =
+        frontBumper.clone();
+
+
+    rearBumper.position.z=
+        4.12;
+
+
+    carGroup.add(
+        rearBumper
+    );
+
+
+    /* ==================================================
+       FRONT LIGHTS
+    ================================================== */
+
+    const leftHeadlight =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                .72,
+                .38,
+                .12
+            ),
+
+            headLightMaterial
+
+        );
+
+
+    leftHeadlight.position.set(
+        -1.35,
+        1.45,
+        -4.14
+    );
+
+
+    carGroup.add(
+        leftHeadlight
+    );
+
+
+    const rightHeadlight =
+        leftHeadlight.clone();
+
+
+    rightHeadlight.position.x=
+        1.35;
+
+
+    carGroup.add(
+        rightHeadlight
+    );
+
+
+    /* ==================================================
+       TAIL LIGHTS
+    ================================================== */
+
+    const leftTail =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                .7,
+                .38,
+                .12
+            ),
+
+            tailLightMaterial
+
+        );
+
+
+    leftTail.position.set(
+        -1.35,
+        1.45,
+        4.14
+    );
+
+
+    carGroup.add(
+        leftTail
+    );
+
+
+    const rightTail =
+        leftTail.clone();
+
+
+    rightTail.position.x=
+        1.35;
+
+
+    carGroup.add(
+        rightTail
+    );
+
+
+    /* ==================================================
+       WHEELS
+    ================================================== */
+
+    const wheels=[];
+
+
+    function addWheel(
+        x,
+        z
+    ){
+
+        const wheel =
+            new THREE.Mesh(
+
+                new THREE.CylinderGeometry(
+                    .78,
+                    .78,
+                    .48,
+                    18
+                ),
+
+                tireMaterial
+
+            );
+
+
+        wheel.rotation.z=
+            Math.PI/2;
+
+
+        wheel.position.set(
+            x,
+            .78,
+            z
+        );
+
+
+        wheel.castShadow=true;
+
+
+        carGroup.add(
+            wheel
+        );
+
+
+        wheels.push(
+            wheel
+        );
+
+
+        const rim =
+            new THREE.Mesh(
+
+                new THREE.CylinderGeometry(
+                    .38,
+                    .38,
+                    .5,
+                    16
+                ),
+
+                chromeMaterial
+
+            );
+
+
+        rim.rotation.z=
+            Math.PI/2;
+
+
+        rim.position.copy(
+            wheel.position
+        );
+
+
+        carGroup.add(
+            rim
+        );
+
+    }
+
+
+    addWheel(
+        -2.12,
+        -2.65
+    );
+
+
+    addWheel(
+        2.12,
+        -2.65
+    );
+
+
+    addWheel(
+        -2.12,
+        2.55
+    );
+
+
+    addWheel(
+        2.12,
+        2.55
+    );
+
+
+    carGroup.userData.wheels=
+        wheels;
+
+
+    carGroup.userData.speed=
+        12+
+        Math.random()*8;
+
+
+    carGroup.userData.direction=
+        Math.random()<.5
+        ? 1
+        : -1;
+
+
+    carGroup.userData.traffic=
+        true;
+
+
+    carGroup.userData.steering=
+        0;
+
+
+    carGroup.traverse(
+        object=>{
+
+            if(object.isMesh){
+
+                object.castShadow=true;
+
+                object.receiveShadow=true;
+
+            }
+
+        }
+    );
+
+
+    return carGroup;
+
+}
+
+
+/* ==================================================
+   PLAYER VEHICLE
+================================================== */
+
+car =
+    createDetailedCar(
+        0x1565c0
+    );
+
+
+car.position.set(
+    0,
+    0,
+    45
+);
+
+
+car.rotation.y=
+    Math.PI;
+
+
+scene.add(
+    car
+);
+
+
+playerVehicles.push(
+    car
+);
+
+
+/* ==================================================
+   PLAYER
+================================================== */
+
+function createPlayer(){
+
+    const player =
+        new THREE.Group();
+
+
+    const skinMaterial =
+        material(
+            0xc68663
+        );
+
+
+    const shirtMaterial =
+        material(
+            0x24558c
+        );
+
+
+    const pantsMaterial =
+        material(
+            0x252525
+        );
+
+
+    /* BODY */
+
+    const body =
+        new THREE.Mesh(
+
+            new THREE.CapsuleGeometry(
+                .42,
+                1.15,
+                5,
+                10
+            ),
+
+            shirtMaterial
+
+        );
+
+
+    body.position.y=
+        1.55;
+
+
+    player.add(
+        body
+    );
+
+
+    /* HEAD */
+
+    const head =
+        new THREE.Mesh(
+
+            new THREE.SphereGeometry(
+                .36,
+                16,
+                16
+            ),
+
+            skinMaterial
+
+        );
+
+
+    head.position.y=
+        2.85;
+
+
+    player.add(
+        head
+    );
+
+
+    /* HAIR */
+
+    const hair =
+        new THREE.Mesh(
+
+            new THREE.SphereGeometry(
+                .37,
+                16,
+                12
+            ),
+
+            material(
+                0x24201d
+            )
+
+        );
+
+
+    hair.position.set(
+        0,
+        3.03,
+        -.02
+    );
+
+
+    hair.scale.y=
+        .55;
+
+
+    player.add(
+        hair
+    );
+
+
+    /* ARMS */
+
+    const armGeometry =
+        new THREE.CapsuleGeometry(
+            .13,
+            .8,
+            4,
+            8
+        );
+
+
+    const leftArm =
+        new THREE.Mesh(
+            armGeometry,
+            shirtMaterial
+        );
+
+
+    leftArm.position.set(
+        -.58,
+        1.65,
+        0
+    );
+
+
+    leftArm.rotation.z=
+        -.12;
+
+
+    player.add(
+        leftArm
+    );
+
+
+    const rightArm =
+        leftArm.clone();
+
+
+    rightArm.position.x=
+        .58;
+
+
+    rightArm.rotation.z=
+        .12;
+
+
+    player.add(
+        rightArm
+    );
+
+
+    /* LEGS */
+
+    const legGeometry =
+        new THREE.CapsuleGeometry(
+            .15,
+            .9,
+            4,
+            8
+        );
+
+
+    const leftLeg =
+        new THREE.Mesh(
+            legGeometry,
+            pantsMaterial
+        );
+
+
+    leftLeg.position.set(
+        -.22,
+        .55,
+        0
+    );
+
+
+    player.add(
+        leftLeg
+    );
+
+
+    const rightLeg =
+        leftLeg.clone();
+
+
+    rightLeg.position.x=
+        .22;
+
+
+    player.add(
+        rightLeg
+    );
+
+
+    player.userData.leftLeg=
+        leftLeg;
+
+
+    player.userData.rightLeg=
+        rightLeg;
+
+
+    player.userData.leftArm=
+        leftArm;
+
+
+    player.userData.rightArm=
+        rightArm;
+
+
+    player.userData.speed=
+        8;
+
+
+    player.userData.walkTime=
+        0;
+
+
+    player.position.set(
+        0,
+        0,
+        65
+    );
+
+
+    player.traverse(
+        object=>{
+
+            if(object.isMesh){
+
+                object.castShadow=true;
+
+                object.receiveShadow=true;
+
+            }
+
+        }
+    );
+
+
+    scene.add(
+        player
+    );
+
+
+    return player;
+
+}
+
+
+playerGroup =
+    createPlayer();
+
+
+/* ==================================================
+   KEYBOARD
+================================================== */
+
+const keys={};
+
+
+window.addEventListener(
+    "keydown",
+    event=>{
+
+        keys[event.code]=true;
+
+
+        if(
+            event.code==="KeyF"
+        ){
+
+            toggleVehicle();
+
+        }
+
+
+        if(
+            event.code==="KeyE"
+        ){
+
+            enterShop();
+
+        }
+
+    }
+);
+
+
+window.addEventListener(
+    "keyup",
+    event=>{
+
+        keys[event.code]=false;
+
+    }
+);
+
+
+/* ==================================================
+   VEHICLE ENTER / EXIT
+================================================== */
+
+function toggleVehicle(){
+
+    if(!car)
+        return;
+
+
+    if(
+        !inCar
+    ){
+
+        const distance =
+            playerGroup.position.distanceTo(
+                car.position
+            );
+
+
+        if(
+            distance<8
+        ){
+
+            inCar=true;
+
+
+            playerGroup.visible=
+                false;
+
+
+            showMessage(
+                "Entered vehicle"
+            );
+
+        }
+
+    }
+    else{
+
+        inCar=false;
+
+
+        playerGroup.visible=
+            true;
+
+
+        playerGroup.position.copy(
+            car.position
+        );
+
+
+        playerGroup.position.x+=
+            6;
+
+
+        showMessage(
+            "Exited vehicle"
+        );
+
+    }
+
+}
+
+
+/* ==================================================
+   PLAYER MOVEMENT
+================================================== */
+
+function updatePlayer(
+    dt
+){
+
+    if(
+        inCar
+    ){
+
+        updatePlayerCar(
+            dt
+        );
+
+        return;
+
+    }
+
+
+    let forward=0;
+
+    let side=0;
+
+
+    if(
+        keys["KeyW"] ||
+        keys["ArrowUp"]
+    ){
+
+        forward+=1;
+
+    }
+
+
+    if(
+        keys["KeyS"] ||
+        keys["ArrowDown"]
+    ){
+
+        forward-=1;
+
+    }
+
+
+    if(
+        keys["KeyA"] ||
+        keys["ArrowLeft"]
+    ){
+
+        side-=1;
+
+    }
+
+
+    if(
+        keys["KeyD"] ||
+        keys["ArrowRight"]
+    ){
+
+        side+=1;
+
+    }
+
+
+    const movement =
+        new THREE.Vector3(
+            side,
+            0,
+            -forward
+        );
+
+
+    if(
+        movement.length()>0
+    ){
+
+        movement.normalize();
+
+
+        movement.multiplyScalar(
+            playerGroup.userData.speed*
+            dt
+        );
+
+
+        playerGroup.position.add(
+            movement
+        );
+
+
+        playerGroup.rotation.y=
+            Math.atan2(
+                movement.x,
+                movement.z
+            );
+
+
+        playerGroup.userData.walkTime+=
+            dt*9;
+
+
+        const swing =
+            Math.sin(
+                playerGroup.userData.walkTime
+            )*.55;
+
+
+        playerGroup.userData.leftLeg
+            .rotation.x=
+            swing;
+
+
+        playerGroup.userData.rightLeg
+            .rotation.x=
+            -swing;
+
+
+        playerGroup.userData.leftArm
+            .rotation.x=
+            -swing*.65;
+
+
+        playerGroup.userData.rightArm
+            .rotation.x=
+            swing*.65;
+
+    }
+
+
+    keepInsideWorld(
+        playerGroup
+    );
+
+}
+
+
+/* ==================================================
+   PLAYER CAR MOVEMENT
+================================================== */
+
+function updatePlayerCar(
+    dt
+){
+
+    let acceleration=0;
+
+
+    if(
+        keys["KeyW"] ||
+        keys["ArrowUp"]
+    ){
+
+        acceleration+=22;
+
+    }
+
+
+    if(
+        keys["KeyS"] ||
+        keys["ArrowDown"]
+    ){
+
+        acceleration-=18;
+
+    }
+
+
+    carSpeed +=
+        acceleration*dt;
+
+
+    carSpeed *=
+        .985;
+
+
+    carSpeed =
+        THREE.MathUtils.clamp(
+            carSpeed,
+            -18,
+            38
+        );
+
+
+    if(
+        Math.abs(carSpeed)>.5
+    ){
+
+        let steering=0;
+
+
+        if(
+            keys["KeyA"] ||
+            keys["ArrowLeft"]
+        ){
+
+            steering+=1;
+
+        }
+
+
+        if(
+            keys["KeyD"] ||
+            keys["ArrowRight"]
+        ){
+
+            steering-=1;
+
+        }
+
+
+        car.rotation.y +=
+            steering*
+            dt*
+            .85*
+            Math.min(
+                1,
+                Math.abs(carSpeed)/8
+            );
+
+
+        const direction =
+            new THREE.Vector3(
+                0,
+                0,
+                1
+            );
+
+
+        direction.applyQuaternion(
+            car.quaternion
+        );
+
+
+        car.position.add(
+            direction.multiplyScalar(
+                carSpeed*dt
+            )
+        );
+
+
+        car.userData.wheels
+            .forEach(
+                wheel=>{
+
+                    wheel.rotation.x+=
+                        carSpeed*
+                        dt;
+
+                }
+            );
+
+    }
+
+
+    keepInsideWorld(
+        car
+    );
+
+}
+
+
+/* ==================================================
+   WORLD BOUNDS
+================================================== */
+
+function keepInsideWorld(
+    object
+){
+
+    const limit=
+        WORLD_SIZE/2-25;
+
+
+    object.position.x=
+        THREE.MathUtils.clamp(
+            object.position.x,
+            -limit,
+            limit
+        );
+
+
+    object.position.z=
+        THREE.MathUtils.clamp(
+            object.position.z,
+            -limit,
+            limit
+        );
+
+}
+
+
+/* ==================================================
+   TRAFFIC CAR SPAWN
+================================================== */
+
+function spawnTrafficCar(){
+
+    const traffic =
+        createDetailedCar();
+
+
+    const roadIndex =
+        Math.floor(
+            Math.random()*6
+        );
+
+
+    const roadPosition =
+        -750+
+        roadIndex*300;
+
+
+    const vertical=
+        Math.random()<.5;
+
+
+    if(
+        vertical
+    ){
+
+        traffic.position.set(
+
+            roadPosition,
+
+            0,
+
+            -800+
+            Math.random()*1600
+
+        );
+
+
+        traffic.rotation.y=
+            Math.random()<.5
+            ? 0
+            : Math.PI;
+
+    }
+    else{
+
+        traffic.position.set(
+
+            -800+
+            Math.random()*1600,
+
+            0,
+
+            roadPosition
+
+        );
+
+
+        traffic.rotation.y=
+            Math.random()<.5
+            ? Math.PI/2
+            : -Math.PI/2;
+
+    }
+
+
+    traffic.userData.vertical=
+        vertical;
+
+
+    traffic.userData.road=
+        roadPosition;
+
+
+    scene.add(
+        traffic
+    );
+
+
+    trafficCars.push(
+        traffic
+    );
+
+}
+
+
+/* ==================================================
+   INITIAL TRAFFIC
+================================================== */
+
+for(
+    let i=0;
+    i<22;
+    i++
+){
+
+    spawnTrafficCar();
+
+}
+
+
+/* ==================================================
+   TRAFFIC UPDATE
+================================================== */
+
+function updateTraffic(
+    dt
+){
+
+    trafficCars.forEach(
+        vehicle=>{
+
+            const speed =
+                vehicle.userData.speed;
+
+
+            const direction =
+                new THREE.Vector3(
+                    0,
+                    0,
+                    1
+                );
+
+
+            direction.applyQuaternion(
+                vehicle.quaternion
+            );
+
+
+            vehicle.position.add(
+                direction.multiplyScalar(
+                    speed*dt
+                )
+            );
+
+
+            vehicle.userData.wheels
+                .forEach(
+                    wheel=>{
+
+                        wheel.rotation.x+=
+                            speed*
+                            dt;
+
+                    }
+                );
+
+
+            if(
+                vehicle.position.x>
+                WORLD_SIZE/2
+            ){
+
+                vehicle.position.x=
+                    -WORLD_SIZE/2;
+
+            }
+
+
+            if(
+                vehicle.position.x<
+                -WORLD_SIZE/2
+            ){
+
+                vehicle.position.x=
+                    WORLD_SIZE/2;
+
+            }
+
+
+            if(
+                vehicle.position.z>
+                WORLD_SIZE/2
+            ){
+
+                vehicle.position.z=
+                    -WORLD_SIZE/2;
+
+            }
+
+
+            if(
+                vehicle.position.z<
+                -WORLD_SIZE/2
+            ){
+
+                vehicle.position.z=
+                    WORLD_SIZE/2;
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ==================================================
+   TRAFFIC COLLISION
+================================================== */
+
+function checkVehicleCollision(){
+
+    if(!inCar)
+        return;
+
+
+    trafficCars.forEach(
+        vehicle=>{
+
+            const distance =
+                car.position.distanceTo(
+                    vehicle.position
+                );
+
+
+            if(
+                distance<5
+            ){
+
+                const push =
+                    new THREE.Vector3()
+                        .subVectors(
+                            car.position,
+                            vehicle.position
+                        );
+
+
+                push.y=0;
+
+
+                if(
+                    push.length()<.1
+                ){
+
+                    push.set(
+                        1,
+                        0,
+                        0
+                    );
+
+                }
+
+
+                push.normalize();
+
+
+                car.position.add(
+                    push.multiplyScalar(
+                        .8
+                    )
+                );
+
+
+                carSpeed*=
+                    .65;
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ==================================================
+   SHOPS
+================================================== */
+
+let stage9Shops=[];
+
+
+function createShopBuilding(
+    name,
+    x,
+    z,
+    color,
+    width=22,
+    depth=16
+){
+
+    const group =
+        new THREE.Group();
+
+
+    const building =
+        createBox(
+
+            width,
+            9,
+            depth,
+
+            material(
+                0x30383d
+            )
+
+        );
+
+
+    building.position.y=
+        4.5;
+
+
+    group.add(
+        building
+    );
+
+
+    /* FRONT WINDOW */
+
+    const front =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                width-3,
+                5,
+                .12
+            ),
+
+            glassMaterial
+
+        );
+
+
+    front.position.set(
+        0,
+        3.5,
+        -depth/2-.08
+    );
+
+
+    group.add(
+        front
+    );
+
+
+    /* DOOR */
+
+    const door =
+        createBox(
+
+            3,
+            5,
+            .25,
+
+            material(
+                0x151515,
+                .25
+            )
+
+        );
+
+
+    door.position.set(
+        0,
+        2.5,
+        -depth/2-.2
+    );
+
+
+    group.add(
+        door
+    );
+
+
+    /* SIGN */
+
+    const signMaterial =
+        new THREE.MeshStandardMaterial({
+
+            color:color,
+
+            emissive:color,
+
+            emissiveIntensity:.35
+
+        });
+
+
+    const sign =
+        createBox(
+
+            width-2,
+            1.8,
+            .35,
+
+            signMaterial
+
+        );
+
+
+    sign.position.set(
+        0,
+        8,
+        -depth/2-.25
+    );
+
+
+    group.add(
+        sign
+    );
+
+
+    group.position.set(
+        x,
+        0,
+        z
+    );
+
+
+    group.userData.name=
+        name;
+
+
+    group.userData.radius=
+        16;
+
+
+    scene.add(
+        group
+    );
+
+
+    stage9Shops.push(
+        group
+    );
+
+
+    createDistrictLabel(
+        name,
+        x,
+        z-13
+    );
+
+
+    return group;
+
+}
+
+
+/* ==================================================
+   CITY BUSINESSES
+================================================== */
+
+createShopBuilding(
+    "MEGA MARKET",
+    -150,
+    90,
+    0x2e9d59
+);
+
+
+createShopBuilding(
+    "AUTO DEALERSHIP",
+    150,
+    90,
+    0x2468b5,
+    30,
+    20
+);
+
+
+createShopBuilding(
+    "FASHION",
+    -150,
+    -90,
+    0x8d42a8
+);
+
+
+createShopBuilding(
+    "CAFE",
+    150,
+    -90,
+    0xc87928
+);
+
+
+createShopBuilding(
+    "CITY BANK",
+    -300,
+    0,
+    0x2670a8,
+    26,
+    18
+);
+
+
+createShopBuilding(
+    "HOTEL",
+    300,
+    0,
+    0x9c3838,
+    28,
+    20
+);
+
+
+/* ==================================================
+   SHOP INTERACTION
+================================================== */
+
+function enterShop(){
+
+    const target =
+        inCar
+        ? car.position
+        : playerGroup.position;
+
+
+    for(
+        const shop of stage9Shops
+    ){
+
+        const distance =
+            target.distanceTo(
+                shop.position
+            );
+
+
+        if(
+            distance<
+            shop.userData.radius
+        ){
+
+            showMessage(
+                shop.userData.name+
+                "  •  ENTER"
+            );
+
+
+            return;
+
+        }
+
+    }
+
+}
+
+
+/* ==================================================
+   UI HELPERS
+================================================== */
+
+function showMessage(
+    text
+){
+
+    const element =
+        document.getElementById(
+            "message"
+        );
+
+
+    if(!element)
+        return;
+
+
+    element.textContent=
+        text;
+
+
+    element.style.opacity=
+        "1";
+
+
+    clearTimeout(
+        window.stage9MessageTimer
+    );
+
+
+    window.stage9MessageTimer=
+        setTimeout(
+            function(){
+
+                element.style.opacity=
+                    "0";
+
+            },
+            2200
+        );
+
+}
+
+
+/* ==================================================
+   UI UPDATE
+================================================== */
+
+function updateUI(){
+
+    const moneyElement =
+        document.getElementById(
+            "money"
+        );
+
+
+    if(
+        moneyElement
+    ){
+
+        moneyElement.textContent=
+            "$"+
+            money.toLocaleString();
+
+    }
+
+
+    const healthElement =
+        document.getElementById(
+            "health"
+        );
+
+
+    if(
+        healthElement
+    ){
+
+        healthElement.style.width=
+            playerHealth+
+            "%";
+
+    }
+
+
+    const ammoElement =
+        document.getElementById(
+            "ammo"
+        );
+
+
+    if(
+        ammoElement
+    ){
+
+        ammoElement.textContent=
+            "30 / "+
+            reserveAmmo;
+
+    }
+
+}
+
+
+/* ==================================================
+   CAMERA
+================================================== */
+
+function updateCamera(
+    dt
+){
+
+    const target =
+        inCar
+        ? car
+        : playerGroup;
+
+
+    const distance =
+        inCar
+        ? 16
+        : 10;
+
+
+    const height =
+        inCar
+        ? 8
+        : 6;
+
+
+    const desired =
+        new THREE.Vector3(
+            0,
+            height,
+            distance
+        );
+
+
+    desired.applyQuaternion(
+        target.quaternion
+    );
+
+
+    desired.add(
+        target.position
+    );
+
+
+    camera.position.lerp(
+        desired,
+        1-
+        Math.pow(
+            .001,
+            dt
+        )
+    );
+
+
+    const lookTarget =
+        target.position.clone();
+
+
+    lookTarget.y+=
+        inCar
+        ? 2
+        : 1.8;
+
+
+    camera.lookAt(
+        lookTarget
+    );
+
+}
+
+
+/* ==================================================
+   DAY / NIGHT VARIABLES
+================================================== */
+
+let worldTime=12;
+
+let nightMode=false;
+
+
+/* ==================================================
+   DAY / NIGHT UPDATE
+================================================== */
+
+function updateDayNight(
+    dt
+){
+
+    worldTime+=
+        dt*.12;
+
+
+    if(
+        worldTime>=24
+    ){
+
+        worldTime=0;
+
+    }
+
+
+    const night =
+        worldTime>=19 ||
+        worldTime<=6;
+
+
+    if(
+        night!==nightMode
+    ){
+
+        nightMode=
+            night;
+
+    }
+
+
+    if(
+        nightMode
+    ){
+
+        scene.background.lerp(
+            new THREE.Color(
+                0x101a2c
+            ),
+            .015
+        );
+
+
+        scene.fog.color.lerp(
+            new THREE.Color(
+                0x101a2c
+            ),
+            .015
+        );
+
+
+        sun.intensity=
+            THREE.MathUtils.lerp(
+                sun.intensity,
+                .35,
+                .02
+            );
+
+    }
+    else{
+
+        scene.background.lerp(
+            new THREE.Color(
+                0x87a9c4
+            ),
+            .015
+        );
+
+
+        scene.fog.color.lerp(
+            new THREE.Color(
+                0x87a9c4
+            ),
+            .015
+        );
+
+
+        sun.intensity=
+            THREE.MathUtils.lerp(
+                sun.intensity,
+                2.4,
+                .02
+            );
+
+    }
+
+}
+/* ==================================================
+   STAGE 9 — PART 3/3
+   MAP + DISTRICTS + MINIMAP + POLICE + MISSIONS
+   + PARKS + GAS STATIONS + HUD + GAME LOOP
+================================================== */
+
+
+/* ==================================================
+   DISTRICTS
+================================================== */
+
+const districts = [
+
+    {
+        name:"DOWNTOWN",
+        x:0,
+        z:0
+    },
+
+    {
+        name:"VINEWOOD",
+        x:300,
+        z:-300
+    },
+
+    {
+        name:"RICHMAN",
+        x:-300,
+        z:-300
+    },
+
+    {
+        name:"EASTSIDE",
+        x:300,
+        z:300
+    },
+
+    {
+        name:"SOUTHSIDE",
+        x:-300,
+        z:300
+    },
+
+    {
+        name:"INDUSTRIAL",
+        x:-550,
+        z:0
+    },
+
+    {
+        name:"BEACHFRONT",
+        x:550,
+        z:0
+    }
+
+];
+
+
+/* ==================================================
+   DISTRICT LABEL
+================================================== */
+
+function createDistrictLabel(
+    text,
+    x,
+    z
+){
+
+    const canvas =
+        document.createElement(
+            "canvas"
+        );
+
+
+    canvas.width=900;
+    canvas.height=180;
+
+
+    const ctx=
+        canvas.getContext(
+            "2d"
+        );
+
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    ctx.textAlign=
+        "center";
+
+
+    ctx.textBaseline=
+        "middle";
+
+
+    ctx.font=
+        "bold 70px Arial";
+
+
+    ctx.fillStyle=
+        "white";
+
+
+    ctx.strokeStyle=
+        "black";
+
+
+    ctx.lineWidth=
+        12;
+
+
+    ctx.strokeText(
+        text,
+        450,
+        90
+    );
+
+
+    ctx.fillText(
+        text,
+        450,
+        90
+    );
+
+
+    const texture=
+        new THREE.CanvasTexture(
+            canvas
+        );
+
+
+    const sprite=
+        new THREE.Sprite(
+
+            new THREE.SpriteMaterial({
+
+                map:texture,
+
+                transparent:true,
+
+                depthWrite:false
+
+            })
+
+        );
+
+
+    sprite.position.set(
+        x,
+        12,
+        z
+    );
+
+
+    sprite.scale.set(
+        35,
+        7,
+        1
+    );
+
+
+    scene.add(
+        sprite
+    );
+
+}
+
+
+/* ==================================================
+   DISTRICT NAMES
+================================================== */
+
+districts.forEach(
+    district=>{
+
+        createDistrictLabel(
+            district.name,
+            district.x,
+            district.z
+        );
+
+    }
+);
+
+
+/* ==================================================
+   PARK SYSTEM
+================================================== */
+
+let parks=[];
+
+
+function createPark(
+    x,
+    z,
+    width,
+    depth,
+    name
+){
+
+    const park=
+        new THREE.Group();
+
+
+    const grass=
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                width,
+                .15,
+                depth
+            ),
+
+            new THREE.MeshStandardMaterial({
+
+                color:0x397a3a,
+
+                roughness:1
+
+            })
+
+        );
+
+
+    grass.position.y=
+        .08;
+
+
+    park.add(
+        grass
+    );
+
+
+    /* TREES */
+
+    for(
+        let i=0;
+        i<18;
+        i++
+    ){
+
+        const tree=
+            new THREE.Group();
+
+
+        const trunk=
+            new THREE.Mesh(
+
+                new THREE.CylinderGeometry(
+                    .22,
+                    .32,
+                    2.2,
+                    8
+                ),
+
+                new THREE.MeshStandardMaterial({
+
+                    color:0x5c3924
+
+                })
+
+            );
+
+
+        trunk.position.y=
+            1.1;
+
+
+        tree.add(
+            trunk
+        );
+
+
+        const leaves=
+            new THREE.Mesh(
+
+                new THREE.SphereGeometry(
+                    1.5,
+                    10,
+                    10
+                ),
+
+                new THREE.MeshStandardMaterial({
+
+                    color:0x216b35
+
+                })
+
+            );
+
+
+        leaves.position.y=
+            3;
+
+
+        tree.add(
+            leaves
+        );
+
+
+        tree.position.set(
+
+            (Math.random()-.5)*
+            (width-5),
+
+            0,
+
+            (Math.random()-.5)*
+            (depth-5)
+
+        );
+
+
+        park.add(
+            tree
+        );
+
+    }
+
+
+    /* BENCHES */
+
+    for(
+        let i=0;
+        i<4;
+        i++
+    ){
+
+        const bench=
+            new THREE.Mesh(
+
+                new THREE.BoxGeometry(
+                    3,
+                    .35,
+                    .7
+                ),
+
+                new THREE.MeshStandardMaterial({
+
+                    color:0x70452b
+
+                })
+
+            );
+
+
+        bench.position.set(
+
+            (Math.random()-.5)*
+            (width-6),
+
+            .7,
+
+            (Math.random()-.5)*
+            (depth-6)
+
+        );
+
+
+        park.add(
+            bench
+        );
+
+    }
+
+
+    park.position.set(
+        x,
+        0,
+        z
+    );
+
+
+    scene.add(
+        park
+    );
+
+
+    parks.push(
+        park
+    );
+
+
+    createDistrictLabel(
+        name,
+        x,
+        z
+    );
+
+}
+
+
+/* ==================================================
+   CITY PARKS
+================================================== */
+
+createPark(
+    -300,
+    -300,
+    120,
+    100,
+    "CENTRAL PARK"
+);
+
+
+createPark(
+    300,
+    300,
+    110,
+    90,
+    "EAST PARK"
+);
+
+
+/* ==================================================
+   GAS STATIONS
+================================================== */
+
+let gasStations=[];
+
+
+function createGasStation(
+    x,
+    z
+){
+
+    const station=
+        new THREE.Group();
+
+
+    const roof=
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                28,
+                .8,
+                18
+            ),
+
+            new THREE.MeshStandardMaterial({
+
+                color:0xe9e9e9
+
+            })
+
+        );
+
+
+    roof.position.y=
+        7;
+
+
+    station.add(
+        roof
+    );
+
+
+    /* COLUMNS */
+
+    for(
+        let i=0;
+        i<4;
+        i++
+    ){
+
+        const column=
+            new THREE.Mesh(
+
+                new THREE.BoxGeometry(
+                    .7,
+                    7,
+                    .7
+                ),
+
+                new THREE.MeshStandardMaterial({
+
+                    color:0xeeeeee
+
+                })
+
+            );
+
+
+        column.position.set(
+
+            i%2===0
+            ? -11
+            : 11,
+
+            3.5,
+
+            i<2
+            ? -7
+            : 7
+
+        );
+
+
+        station.add(
+            column
+        );
+
+    }
+
+
+    /* PUMPS */
+
+    for(
+        let i=0;
+        i<6;
+        i++
+    ){
+
+        const pump=
+            new THREE.Mesh(
+
+                new THREE.BoxGeometry(
+                    2,
+                    2.2,
+                    1
+                ),
+
+                new THREE.MeshStandardMaterial({
+
+                    color:0xd32f2f
+
+                })
+
+            );
+
+
+        pump.position.set(
+
+            -8+
+            (i%3)*8,
+
+            1.1,
+
+            i<3
+            ? -4
+            : 4
+
+        );
+
+
+        station.add(
+            pump
+        );
+
+    }
+
+
+    /* SIGN */
+
+    const sign=
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                3,
+                10,
+                3
+            ),
+
+            new THREE.MeshStandardMaterial({
+
+                color:0xe53935,
+
+                emissive:0x550000,
+
+                emissiveIntensity:.4
+
+            })
+
+        );
+
+
+    sign.position.set(
+        16,
+        5,
+        0
+    );
+
+
+    station.add(
+        sign
+    );
+
+
+    station.position.set(
+        x,
+        0,
+        z
+    );
+
+
+    scene.add(
+        station
+    );
+
+
+    gasStations.push(
+        station
+    );
+
+
+    createDistrictLabel(
+        "GAS",
+        x,
+        z-12
+    );
+
+}
+
+
+/* ==================================================
+   GAS STATIONS
+================================================== */
+
+createGasStation(
+    480,
+    180
+);
+
+
+createGasStation(
+    -480,
+    -180
+);
+
+
+/* ==================================================
+   POLICE STATION
+================================================== */
+
+let policeStation;
+
+
+function createPoliceStation(
+    x,
+    z
+){
+
+    policeStation=
+        new THREE.Group();
+
+
+    const building=
+        createBox(
+
+            35,
+            12,
+            25,
+
+            material(
+                0x53606b
+            )
+
+        );
+
+
+    building.position.y=
+        6;
+
+
+    policeStation.add(
+        building
+    );
+
+
+    const roof=
+        createBox(
+
+            38,
+            1,
+            28,
+
+            material(
+                0x222831
+            )
+
+        );
+
+
+    roof.position.y=
+        12.5;
+
+
+    policeStation.add(
+        roof
+    );
+
+
+    const sign=
+        createBox(
+
+            18,
+            2.5,
+            .4,
+
+            material(
+                0x1f6fca,
+
+                .3
+            )
+
+        );
+
+
+    sign.position.set(
+        0,
+        8,
+        -12.8
+    );
+
+
+    policeStation.add(
+        sign
+    );
+
+
+    policeStation.position.set(
+        x,
+        0,
+        z
+    );
+
+
+    scene.add(
+        policeStation
+    );
+
+
+    createDistrictLabel(
+        "POLICE",
+        x,
+        z-18
+    );
+
+}
+
+
+createPoliceStation(
+    0,
+    250
+);
+
+
+/* ==================================================
+   HOSPITAL
+================================================== */
+
+let hospital;
+
+
+function createHospital(
+    x,
+    z
+){
+
+    hospital=
+        new THREE.Group();
+
+
+    const building=
+        createBox(
+
+            40,
+            16,
+            30,
+
+            material(
+                0xe6e6e6
+            )
+
+        );
+
+
+    building.position.y=
+        8;
+
+
+    hospital.add(
+        building
+    );
+
+
+    const redCross=
+        createBox(
+
+            8,
+            2,
+            .5,
+
+            material(
+                0xd32f2f,
+
+                .3
+            )
+
+        );
+
+
+    redCross.position.set(
+        0,
+        10,
+        -15.3
+    );
+
+
+    hospital.add(
+        redCross
+    );
+
+
+    hospital.position.set(
+        x,
+        0,
+        z
+    );
+
+
+    scene.add(
+        hospital
+    );
+
+
+    createDistrictLabel(
+        "HOSPITAL",
+        x,
+        z-20
+    );
+
+}
+
+
+createHospital(
+    -250,
+    250
+);
+
+
+/* ==================================================
+   MINIMAP
+================================================== */
+
+let minimapCanvas;
+
+let minimapContext;
+
+
+function createMinimap(){
+
+    minimapCanvas=
+        document.createElement(
+            "canvas"
+        );
+
+
+    minimapCanvas.width=
+        300;
+
+
+    minimapCanvas.height=
+        300;
+
+
+    minimapCanvas.id=
+        "minimapCanvas";
+
+
+    minimapCanvas.style.position=
+        "fixed";
+
+
+    minimapCanvas.style.right=
+        "25px";
+
+
+    minimapCanvas.style.bottom=
+        "25px";
+
+
+    minimapCanvas.style.width=
+        "300px";
+
+
+    minimapCanvas.style.height=
+        "300px";
+
+
+    minimapCanvas.style.border=
+        "4px solid white";
+
+
+    minimapCanvas.style.borderRadius=
+        "50%";
+
+
+    minimapCanvas.style.background=
+        "#20252b";
+
+
+    minimapCanvas.style.zIndex=
+        "1000";
+
+
+    document.body.appendChild(
+        minimapCanvas
+    );
+
+
+    minimapContext=
+        minimapCanvas.getContext(
+            "2d"
+        );
+
+}
+
+
+createMinimap();
+
+
+/* ==================================================
+   MINIMAP DRAW
+================================================== */
+
+function updateMinimap(){
+
+    if(
+        !minimapContext ||
+        !playerGroup
+    )
+        return;
+
+
+    const ctx=
+        minimapContext;
+
+
+    const w=
+        minimapCanvas.width;
+
+
+    const h=
+        minimapCanvas.height;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        w,
+        h
+    );
+
+
+    ctx.fillStyle=
+        "#1e2429";
+
+
+    ctx.fillRect(
+        0,
+        0,
+        w,
+        h
+    );
+
+
+    const scale=
+        .10;
+
+
+    const centerX=
+        w/2;
+
+
+    const centerY=
+        h/2;
+
+
+    /* ROADS */
+
+    ctx.strokeStyle=
+        "#73787c";
+
+
+    ctx.lineWidth=
+        8;
+
+
+    for(
+        let i=-600;
+        i<=600;
+        i+=200
+    ){
+
+        const x=
+            centerX+
+            (i-playerGroup.position.x)*
+            scale;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x,
+            0
+        );
+
+        ctx.lineTo(
+            x,
+            h
+        );
+
+        ctx.stroke();
+
+
+        const z=
+            centerY+
+            (i-playerGroup.position.z)*
+            scale;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            z
+        );
+
+        ctx.lineTo(
+            w,
+            z
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    /* PARKS */
+
+    ctx.fillStyle=
+        "#2f7338";
+
+
+    parks.forEach(
+        park=>{
+
+            const x=
+                centerX+
+                (park.position.x-
+                playerGroup.position.x)*
+                scale;
+
+
+            const y=
+                centerY+
+                (park.position.z-
+                playerGroup.position.z)*
+                scale;
+
+
+            ctx.fillRect(
+                x-12,
+                y-12,
+                24,
+                24
+            );
+
+        }
+    );
+
+
+    /* SHOPS */
+
+    ctx.fillStyle=
+        "#ffb300";
+
+
+    stage9Shops.forEach(
+        shop=>{
+
+            const x=
+                centerX+
+                (shop.position.x-
+                playerGroup.position.x)*
+                scale;
+
+
+            const y=
+                centerY+
+                (shop.position.z-
+                playerGroup.position.z)*
+                scale;
+
+
+            ctx.fillRect(
+                x-4,
+                y-4,
+                8,
+                8
+            );
+
+        }
+    );
+
+
+    /* POLICE */
+
+    if(
+        policeStation
+    ){
+
+        const x=
+            centerX+
+            (policeStation.position.x-
+            playerGroup.position.x)*
+            scale;
+
+
+        const y=
+            centerY+
+            (policeStation.position.z-
+            playerGroup.position.z)*
+            scale;
+
+
+        ctx.fillStyle=
+            "#2980ff";
+
+
+        ctx.fillRect(
+            x-5,
+            y-5,
+            10,
+            10
+        );
+
+    }
+
+
+    /* PLAYER */
+
+    ctx.save();
+
+
+    ctx.translate(
+        centerX,
+        centerY
+    );
+
+
+    ctx.rotate(
+        inCar
+        ? -car.rotation.y
+        : -playerGroup.rotation.y
+    );
+
+
+    ctx.fillStyle=
+        "#ffffff";
+
+
+    ctx.beginPath();
+
+
+    ctx.moveTo(
+        0,
+        -10
+    );
+
+
+    ctx.lineTo(
+        7,
+        8
+    );
+
+
+    ctx.lineTo(
+        -7,
+        8
+    );
+
+
+    ctx.closePath();
+
+
+    ctx.fill();
+
+
+    ctx.restore();
+
+}
+
+
+/* ==================================================
+   WANTED SYSTEM
+================================================== */
+
+let wantedLevel=
+    typeof wantedStars!=="undefined"
+    ? wantedStars
+    : 0;
+
+
+function increaseWanted(
+    amount=1
+){
+
+    wantedLevel=
+        Math.min(
+            5,
+            wantedLevel+
+            amount
+        );
+
+
+    updateWantedUI();
+
+}
+
+
+function decreaseWanted(){
+
+    wantedLevel=
+        Math.max(
+            0,
+            wantedLevel-1
+        );
+
+
+    updateWantedUI();
+
+}
+
+
+function updateWantedUI(){
+
+    let element=
+        document.getElementById(
+            "wanted"
+        );
+
+
+    if(!element){
+
+        element=
+            document.createElement(
+                "div"
+            );
+
+
+        element.id=
+            "wanted";
+
+
+        element.style.position=
+            "fixed";
+
+
+        element.style.top=
+            "80px";
+
+
+        element.style.right=
+            "30px";
+
+
+        element.style.fontSize=
+            "30px";
+
+
+        element.style.zIndex=
+            "2000";
+
+
+        document.body.appendChild(
+            element
+        );
+
+    }
+
+
+    let stars="";
+
+
+    for(
+        let i=0;
+        i<5;
+        i++
+    ){
+
+        stars+=
+            i<wantedLevel
+            ? "★"
+            : "☆";
+
+    }
+
+
+    element.textContent=
+        stars;
+
+}
+
+
+/* ==================================================
+   POLICE RESPONSE
+================================================== */
+
+let policeCars=[];
+
+
+function spawnPoliceCar(){
+
+    const police=
+        createDetailedCar(
+            0x182b3f
+        );
+
+
+    police.userData.police=
+        true;
+
+
+    police.userData.speed=
+        16;
+
+
+    police.position.set(
+
+        car.position.x+
+        (Math.random()-.5)*80,
+
+        0,
+
+        car.position.z+
+        (Math.random()-.5)*80
+
+    );
+
+
+    scene.add(
+        police
+    );
+
+
+    policeCars.push(
+        police
+    );
+
+}
+
+
+function updatePolice(
+    dt
+){
+
+    if(
+        wantedLevel<=0
+    )
+        return;
+
+
+    if(
+        policeCars.length<
+        wantedLevel
+    ){
+
+        spawnPoliceCar();
+
+    }
+
+
+    policeCars.forEach(
+        police=>{
+
+            const target=
+                inCar
+                ? car.position
+                : playerGroup.position;
+
+
+            const direction=
+                new THREE.Vector3()
+                    .subVectors(
+                        target,
+                        police.position
+                    );
+
+
+            direction.y=0;
+
+
+            if(
+                direction.length()>1
+            ){
+
+                direction.normalize();
+
+
+                police.position.add(
+                    direction.multiplyScalar(
+                        (12+
+                        wantedLevel*3)*
+                        dt
+                    )
+                );
+
+
+                police.rotation.y=
+                    Math.atan2(
+                        direction.x,
+                        direction.z
+                    );
+
+            }
+
+
+            const distance=
+                police.position.distanceTo(
+                    target
+                );
+
+
+            if(
+                distance<7
+            ){
+
+                if(
+                    inCar
+                ){
+
+                    carSpeed*=
+                        .82;
+
+                }
+                else{
+
+                    playerHealth-=
+                        10*dt;
+
+
+                    if(
+                        playerHealth<=0
+                    ){
+
+                        playerHealth=
+                            100;
+
+                        wantedLevel=
+                            0;
+
+                        updateWantedUI();
+
+                        playerGroup.position.set(
+                            0,
+                            0,
+                            65
+                        );
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ==================================================
+   MISSIONS
+================================================== */
+
+let missions=[
+
+    {
+        title:"GETTING STARTED",
+        x:-150,
+        z:90,
+        reward:500
+    },
+
+    {
+        title:"CITY DELIVERY",
+        x:150,
+        z:-90,
+        reward:900
+    },
+
+    {
+        title:"HOTEL JOB",
+        x:300,
+        z:0,
+        reward:1200
+    },
+
+    {
+        title:"POLICE ESCAPE",
+        x:0,
+        z:250,
+        reward:2000
+    }
+
+];
+
+
+let missionIndex=0;
+
+let missionActive=false;
+
+
+function createMissionMarkers(){
+
+    missions.forEach(
+        (mission,index)=>{
+
+            const marker=
+                new THREE.Mesh(
+
+                    new THREE.CylinderGeometry(
+                        3,
+                        3,
+                        .25,
+                        32
+                    ),
+
+                    new THREE.MeshStandardMaterial({
+
+                        color:
+                            index===0
+                            ? 0x00ff66
+                            : 0xffb300,
+
+                        emissive:
+                            index===0
+                            ? 0x005522
+                            : 0x553300,
+
+                        emissiveIntensity:
+                            1
+
+                    })
+
+                );
+
+
+            marker.position.set(
+                mission.x,
+                .25,
+                mission.z
+            );
+
+
+            marker.userData.mission=
+                mission;
+
+
+            marker.userData.index=
+                index;
+
+
+            scene.add(
+                marker
+            );
+
+
+            missionMarkers.push(
+                marker
+            );
+
+        }
+    );
+
+}
+
+
+createMissionMarkers();
+
+
+/* ==================================================
+   MISSION UPDATE
+================================================== */
+
+function updateMissions(
+    dt
+){
+
+    missionMarkers.forEach(
+        marker=>{
+
+            marker.rotation.y+=
+                dt*1.5;
+
+
+            marker.position.y=
+                .25+
+                Math.sin(
+                    performance.now()*
+                    .003
+                )*.15;
+
+        }
+    );
+
+
+    const target=
+        inCar
+        ? car.position
+        : playerGroup.position;
+
+
+    const mission=
+        missions[
+            missionIndex
+        ];
+
+
+    if(!mission)
+        return;
+
+
+    const distance=
+        target.distanceTo(
+            new THREE.Vector3(
+                mission.x,
+                0,
+                mission.z
+            )
+        );
+
+
+    if(
+        distance<7 &&
+        !missionActive
+    ){
+
+        missionActive=
+            true;
+
+
+        showMessage(
+            mission.title+
+            " STARTED"
+        );
+
+
+        setTimeout(
+            ()=>{
+
+                completeMission();
+
+            },
+            4500
+        );
+
+    }
+
+}
+
+
+/* ==================================================
+   COMPLETE MISSION
+================================================== */
+
+function completeMission(){
+
+    const mission=
+        missions[
+            missionIndex
+        ];
+
+
+    if(!mission)
+        return;
+
+
+    money+=
+        mission.reward;
+
+
+    const moneyElement=
+        document.getElementById(
+            "money"
+        );
+
+
+    if(
+        moneyElement
+    ){
+
+        moneyElement.textContent=
+            "$"+
+            money.toLocaleString();
+
+    }
+
+
+    showMessage(
+        "MISSION COMPLETE  +$"+
+        mission.reward
+    );
+
+
+    missionIndex++;
+
+
+    missionActive=
+        false;
+
+
+    if(
+        missionIndex>=
+        missions.length
+    ){
+
+        missionIndex=0;
+
+    }
+
+
+    missionMarkers.forEach(
+        (marker,index)=>{
+
+            if(
+                index===
+                missionIndex
+            ){
+
+                marker.material.color.set(
+                    0x00ff66
+                );
+
+            }
+            else{
+
+                marker.material.color.set(
+                    0xffb300
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ==================================================
+   INTERACTION HELP
+================================================== */
+
+function updateInteractionText(){
+
+    const target=
+        inCar
+        ? car.position
+        : playerGroup.position;
+
+
+    let text="";
+
+
+    for(
+        const shop of stage9Shops
+    ){
+
+        if(
+            target.distanceTo(
+                shop.position
+            )<shop.userData.radius
+        ){
+
+            text=
+                "E  •  "+
+                shop.userData.name;
+
+            break;
+
+        }
+
+    }
+
+
+    if(
+        !inCar &&
+        target.distanceTo(
+            car.position
+        )<8
+    ){
+
+        text=
+            "F  •  ENTER VEHICLE";
+
+    }
+
+
+    if(
+        inCar
+    ){
+
+        text=
+            "WASD  •  DRIVE     F  •  EXIT";
+
+    }
+
+
+    let help=
+        document.getElementById(
+            "interaction"
+        );
+
+
+    if(!help){
+
+        help=
+            document.createElement(
+                "div"
+            );
+
+
+        help.id=
+            "interaction";
+
+
+        help.style.position=
+            "fixed";
+
+
+        help.style.bottom=
+            "30px";
+
+
+        help.style.left=
+            "50%";
+
+
+        help.style.transform=
+            "translateX(-50%)";
+
+
+        help.style.padding=
+            "12px 25px";
+
+
+        help.style.background=
+            "rgba(0,0,0,.65)";
+
+
+        help.style.color=
+            "white";
+
+
+        help.style.fontFamily=
+            "Arial";
+
+
+        help.style.fontSize=
+            "18px";
+
+
+        help.style.borderRadius=
+            "10px";
+
+
+        help.style.zIndex=
+            "3000";
+
+
+        document.body.appendChild(
+            help
+        );
+
+    }
+
+
+    help.textContent=
+        text;
+
+}
+
+
+/* ==================================================
+   GAME LOOP EXTENSION
+================================================== */
+
+const originalAnimate=
+    typeof animate==="function"
+    ? animate
+    : null;
+
+
+/* ==================================================
+   STAGE 9 UPDATE
+================================================== */
+
+function updateStage9(
+    dt
+){
+
+    updatePlayer(
+        dt
+    );
+
+
+    updateNPCs(
+        dt
+    );
+
+
+    updateTraffic(
+        dt
+    );
+
+
+    checkVehicleCollision();
+
+
+    checkNPCVehicleCollision();
+
+
+    updatePolice(
+        dt
+    );
+
+
+    updateMissions(
+        dt
+    );
+
+
+    updateCamera(
+        dt
+    );
+
+
+    updateMinimap();
+
+
+    updateInteractionText();
+
+
+    updateDayNight(
+        dt
+    );
+
+
+    updateUI();
+
+}
+
+
+/* ==================================================
+   FRAME LOOP
+================================================== */
+
+let stage9LastTime=
+    performance.now();
+
+
+function stage9Loop(){
+
+    const now=
+        performance.now();
+
+
+    const dt=
+        Math.min(
+            .05,
+            (now-
+            stage9LastTime)/
+            1000
+        );
+
+
+    stage9LastTime=
+        now;
+
+
+    updateStage9(
+        dt
+    );
+
+
+    requestAnimationFrame(
+        stage9Loop
+    );
+
+}
+
+
+/* ==================================================
+   START STAGE 9
+================================================== */
+
+createTrafficLightsForStage9();
+
+
+updateWantedUI();
+
+
+stage9Loop();
+
+
+/* ==================================================
+   EXTRA TRAFFIC LIGHTS
+================================================== */
+
+function createTrafficLightsForStage9(){
+
+    const locations=[
+
+        [200,200,0],
+
+        [-200,200,Math.PI],
+
+        [200,-200,Math.PI/2],
+
+        [-200,-200,-Math.PI/2],
+
+        [0,0,0],
+
+        [400,0,Math.PI/2],
+
+        [-400,0,-Math.PI/2],
+
+        [0,400,0],
+
+        [0,-400,Math.PI]
+
+    ];
+
+
+    locations.forEach(
+        data=>{
+
+            if(
+                typeof createTrafficLight==="function"
+            ){
+
+                createTrafficLight(
+                    data[0],
+                    data[1],
+                    data[2]
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ==================================================
+   TRAFFIC LIGHT UPDATE EXTENSION
+================================================== */
+
+const stage9TrafficUpdate=
+    typeof updateTrafficLights==="function"
+    ? updateTrafficLights
+    : null;
