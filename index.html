@@ -1,31 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" href="/path/to/your/favicon.png">
-
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Open World City</title>
 
 <style>
-
 *{
     box-sizing:border-box;
     margin:0;
     padding:0;
 }
 
-html,
-body{
+html,body{
     width:100%;
     height:100%;
     overflow:hidden;
-    background:#000;
+    background:#111;
     font-family:Arial,sans-serif;
 }
 
@@ -34,316 +25,240 @@ body{
     inset:0;
 }
 
-canvas{
-    display:block;
-}
-
-
-/* ================================
-   LOADING
-================================ */
-
 #loading{
     position:fixed;
     inset:0;
-    background:#101010;
-    color:white;
+    z-index:100;
     display:flex;
+    flex-direction:column;
     align-items:center;
     justify-content:center;
-    flex-direction:column;
-    z-index:1000;
+    background:#10151b;
+    color:white;
 }
 
 #loading h1{
     font-size:42px;
-    margin-bottom:20px;
+    margin-bottom:25px;
+    letter-spacing:3px;
 }
 
 #loadingBar{
-    width:300px;
-    height:8px;
-    background:#333;
-    border-radius:10px;
+    width:420px;
+    max-width:80%;
+    height:16px;
+    border:2px solid #555;
+    border-radius:20px;
     overflow:hidden;
 }
 
 #loadingProgress{
     width:0%;
     height:100%;
-    background:#28d34f;
+    background:#168cff;
     transition:.2s;
 }
-
-
-/* ================================
-   START SCREEN
-================================ */
 
 #startScreen{
     position:fixed;
     inset:0;
+    z-index:90;
     display:none;
     align-items:center;
     justify-content:center;
     flex-direction:column;
-    background:rgba(0,0,0,.65);
     color:white;
-    z-index:900;
+    background:
+        linear-gradient(#0008,#000b),
+        linear-gradient(135deg,#162b3d,#111);
+    text-align:center;
 }
 
 #startScreen h1{
-    font-size:60px;
-    margin-bottom:10px;
+    font-size:52px;
+    margin-bottom:12px;
+    text-shadow:0 4px 15px #000;
 }
 
 #startScreen p{
-    color:#ccc;
     margin-bottom:25px;
+    color:#ddd;
 }
 
 #startButton{
-    border:none;
-    background:#e53935;
-    color:white;
-    padding:16px 42px;
+    padding:15px 38px;
+    border:0;
     border-radius:8px;
+    background:#168cff;
+    color:white;
     font-size:20px;
+    font-weight:bold;
     cursor:pointer;
 }
-
-#startButton:hover{
-    background:#ff4d4d;
-}
-
-
-/* ================================
-   HUD
-================================ */
 
 #hud{
     position:fixed;
     inset:0;
+    z-index:20;
     pointer-events:none;
     color:white;
-    z-index:100;
+    text-shadow:0 2px 4px #000;
 }
 
-#money{
+#topLeft{
     position:absolute;
-    top:25px;
-    right:30px;
-    font-size:25px;
+    left:20px;
+    top:20px;
+}
+
+#district{
+    font-size:26px;
     font-weight:bold;
-    text-shadow:2px 2px 4px #000;
-}
-
-#wanted{
-    position:absolute;
-    top:58px;
-    right:30px;
-    color:#fff;
-    font-size:24px;
-    letter-spacing:3px;
-    text-shadow:2px 2px 4px #000;
-}
-
-#healthContainer{
-    position:absolute;
-    left:25px;
-    bottom:25px;
-    width:220px;
-    height:22px;
-    background:#222;
-    border:2px solid #fff;
-    border-radius:5px;
-    overflow:hidden;
-}
-
-#healthBar{
-    width:100%;
-    height:100%;
-    background:#28d34f;
-}
-
-#ammo{
-    position:absolute;
-    right:30px;
-    bottom:25px;
-    font-size:20px;
-    text-shadow:2px 2px 4px #000;
-}
-
-#speedometer{
-    position:absolute;
-    right:30px;
-    bottom:60px;
-    font-size:22px;
-    display:none;
-}
-
-#districtHud{
-    position:absolute;
-    left:50%;
-    top:25px;
-    transform:translateX(-50%);
-    font-size:17px;
-    letter-spacing:2px;
-    text-shadow:2px 2px 4px #000;
 }
 
 #mission{
-    position:absolute;
-    left:25px;
-    top:25px;
-    font-size:18px;
-    max-width:300px;
-    text-shadow:2px 2px 4px #000;
+    margin-top:8px;
+    font-size:15px;
 }
 
-
-/* ================================
-   MINIMAP
-================================ */
-
-#minimap{
-    position:absolute;
-    right:25px;
-    bottom:100px;
-    width:190px;
-    height:190px;
-    border-radius:50%;
-    border:3px solid rgba(255,255,255,.8);
-    background:#111;
+#money{
+    margin-top:7px;
+    font-size:20px;
 }
 
+#healthOuter{
+    margin-top:8px;
+    width:220px;
+    height:14px;
+    background:#333;
+    border-radius:10px;
+    overflow:hidden;
+}
 
-/* ================================
-   CROSSHAIR
-================================ */
+#health{
+    width:100%;
+    height:100%;
+    background:#29d45b;
+}
+
+#topRight{
+    position:absolute;
+    top:20px;
+    right:20px;
+    text-align:right;
+}
+
+#wanted{
+    color:#ffd21c;
+    font-size:25px;
+}
+
+#ammo{
+    margin-top:8px;
+}
+
+#speed{
+    margin-top:8px;
+}
+
+#message{
+    display:none;
+    position:absolute;
+    left:50%;
+    bottom:15%;
+    transform:translateX(-50%);
+    background:#000c;
+    padding:12px 22px;
+    border-radius:8px;
+    font-size:17px;
+}
+
+#districtMessage{
+    position:absolute;
+    top:80px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:28px;
+    font-weight:bold;
+    opacity:0;
+    transition:.4s;
+}
 
 #crosshair{
+    display:none;
     position:absolute;
     left:50%;
     top:50%;
     width:20px;
     height:20px;
     transform:translate(-50%,-50%);
-    display:none;
 }
 
-#crosshair::before,
-#crosshair::after{
+#crosshair:before,
+#crosshair:after{
     content:"";
     position:absolute;
     background:white;
+    box-shadow:0 0 3px #000;
 }
 
-#crosshair::before{
-    width:20px;
-    height:2px;
-    top:9px;
-    left:0;
-}
-
-#crosshair::after{
+#crosshair:before{
     width:2px;
     height:20px;
     left:9px;
-    top:0;
 }
 
+#crosshair:after{
+    width:20px;
+    height:2px;
+    top:9px;
+}
 
-/* ================================
-   MESSAGE
-================================ */
-
-#message{
+#minimap{
     position:absolute;
-    left:50%;
-    bottom:120px;
-    transform:translateX(-50%);
-    padding:12px 20px;
-    background:rgba(0,0,0,.75);
-    border-radius:7px;
-    font-size:17px;
-    display:none;
+    right:20px;
+    bottom:20px;
+    width:190px;
+    height:190px;
+    border:3px solid white;
+    border-radius:50%;
+    background:#335d38;
 }
-
-
-/* ================================
-   DISTRICT NOTIFICATION
-================================ */
-
-#districtNotification{
-    position:absolute;
-    left:50%;
-    top:90px;
-    transform:translateX(-50%);
-    font-size:28px;
-    font-weight:bold;
-    letter-spacing:4px;
-    opacity:0;
-    transition:opacity .4s;
-    text-shadow:2px 2px 5px #000;
-}
-
-
-/* ================================
-   CONTROLS
-================================ */
 
 #controls{
     position:absolute;
-    left:25px;
-    bottom:60px;
-    font-size:12px;
-    color:rgba(255,255,255,.65);
-}
-
-
-/* ================================
-   VEHICLE HUD
-================================ */
-
-#vehicleHud{
-    position:absolute;
-    right:25px;
-    bottom:25px;
-    display:none;
+    bottom:22px;
+    left:22px;
     font-size:13px;
     color:#ddd;
 }
-
 </style>
-
 </head>
 
 <body>
 
 <div id="game"></div>
 
-
-<!-- LOADING -->
-
 <div id="loading">
-
     <h1>LOADING CITY</h1>
 
     <div id="loadingBar">
         <div id="loadingProgress"></div>
     </div>
-
 </div>
-
-
-<!-- START -->
 
 <div id="startScreen">
 
-    <h1>OPEN WORLD</h1>
+    <h1>OPEN WORLD CITY</h1>
 
-    <p>Explore the city, drive cars and complete missions.</p>
+    <p>
+        WASD / Arrow Keys — Move & Drive<br>
+        E — Enter / Exit Vehicle<br>
+        SHIFT — Sprint<br>
+        Mouse — Camera<br>
+        Click — Shoot<br>
+        R — Reload
+    </p>
 
     <button id="startButton">
         START GAME
@@ -351,208 +266,196 @@ canvas{
 
 </div>
 
-
-<!-- HUD -->
-
 <div id="hud">
 
-    <div id="money">
-        $2,500
+    <div id="topLeft">
+
+        <div id="district">
+            DOWNTOWN
+        </div>
+
+        <div id="mission">
+            Mission: Explore Downtown
+        </div>
+
+        <div id="money">
+            $0
+        </div>
+
+        <div id="healthOuter">
+            <div id="health"></div>
+        </div>
+
     </div>
 
-    <div id="wanted">
-        ☆☆☆☆☆
+    <div id="topRight">
+
+        <div id="wanted">
+            ☆☆☆☆☆
+        </div>
+
+        <div id="ammo">
+            12 / 60
+        </div>
+
+        <div id="speed">
+            0 km/h
+        </div>
+
     </div>
 
-    <div id="districtHud">
-        DOWNTOWN
-    </div>
+    <div id="districtMessage"></div>
 
-    <div id="mission">
-        Mission: Explore Downtown
-    </div>
-
-    <div id="healthContainer">
-        <div id="healthBar"></div>
-    </div>
-
-    <div id="ammo">
-        12 / 60
-    </div>
-
-    <div id="speedometer">
-        SPEED: <span id="speed">0</span>
-    </div>
+    <div id="message"></div>
 
     <canvas
         id="minimap"
         width="190"
-        height="190"
-    ></canvas>
+        height="190">
+    </canvas>
 
     <div id="crosshair"></div>
 
-    <div id="message"></div>
-
-    <div id="districtNotification"></div>
-
     <div id="controls">
-        WASD Move • SHIFT Run • E Enter/Exit • R Reload • Mouse Shoot
-    </div>
-
-    <div id="vehicleHud">
-        W/S Drive • A/D Steer • E Exit
+        E: Vehicle / Shop &nbsp; | &nbsp;
+        WASD: Move
     </div>
 
 </div>
 
 
-<!-- THREE.JS -->
-
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
 <script>
 
-/* ==========================================
+"use strict";
+
+
+/* =====================================================
    GAME VARIABLES
-========================================== */
+===================================================== */
 
 let scene;
 let camera;
 let renderer;
 
-let player;
 let playerGroup;
+let player;
 
 let car;
 
-let trafficCars = [];
-let policeCars = [];
-let npcs = [];
-let shops = [];
-let trafficLights = [];
+let npcs=[];
+let trafficCars=[];
+let policeCars=[];
 
-let keys = {};
+let shops=[];
+let trafficLights=[];
 
-let gameStarted = false;
-let pointerLocked = false;
-let inCar = false;
+let keys={};
 
-let yaw = 0;
-let pitch = -0.15;
+let gameStarted=false;
+let inCar=false;
 
-let carSpeed = 0;
+let pointerLocked=false;
 
-let playerHealth = 100;
+let playerHealth=100;
 
-let ammo = 12;
-let reserveAmmo = 60;
+let ammo=12;
+let reserveAmmo=60;
 
-let money = 2500;
+let money=0;
 
-let wantedLevel = 0;
+let wantedLevel=0;
+let wantedTimer=0;
 
-let damageCooldown = 0;
+let carSpeed=0;
 
-let cameraShake = 0;
+let cameraYaw=0;
+let cameraPitch=-0.08;
 
-let currentDistrict =
-    "DOWNTOWN";
+let cameraShake=0;
 
-let policeSpawnTimer = 0;
+let currentDistrict="";
 
-let wantedDecayTimer = 0;
+let activeMission=0;
 
-let npcSpawnTimer = 0;
+let missionCompleted=false;
 
-let eventTimer = 0;
+let worldTime=10;
 
-let districtTimer;
+let messageTimer=0;
 
-let messageTimeout;
-
-let activeMission = 0;
-
-let missionCompleted = false;
+let npcSpawnTimer=0;
 
 
-/* ==========================================
+/* =====================================================
    WORLD
-========================================== */
+===================================================== */
 
-const WORLD_SIZE = 900;
+const WORLD_SIZE=1000;
 
-const ROAD_WIDTH = 24;
+const ROAD_SIZE=24;
 
-const BLOCK_SIZE = 80;
+const SIDEWALK_SIZE=7;
+
+const roadPositions=[];
+
+for(
+    let i=-450;
+    i<=450;
+    i+=90
+){
+    roadPositions.push(i);
+}
 
 
-/* ==========================================
-   SCENE
-========================================== */
+/* =====================================================
+   THREE.JS
+===================================================== */
 
-scene =
-    new THREE.Scene();
+scene=new THREE.Scene();
 
-
-scene.background =
+scene.background=
     new THREE.Color(
-        0x87b9df
+        0x86b8d8
     );
 
-
-scene.fog =
+scene.fog=
     new THREE.Fog(
-        0x87b9df,
-        280,
-        850
+        0x86b8d8,
+        120,
+        750
     );
 
 
-camera =
+camera=
     new THREE.PerspectiveCamera(
-        65,
-        window.innerWidth /
-        window.innerHeight,
-        0.1,
-        1200
+        70,
+        innerWidth/innerHeight,
+        .1,
+        1600
     );
 
 
-camera.position.set(
-    0,
-    5,
-    10
-);
-
-
-/* ==========================================
-   RENDERER
-========================================== */
-
-renderer =
+renderer=
     new THREE.WebGLRenderer({
         antialias:true
     });
 
 
 renderer.setSize(
-    window.innerWidth,
-    window.innerHeight
+    innerWidth,
+    innerHeight
 );
-
 
 renderer.setPixelRatio(
     Math.min(
-        window.devicePixelRatio,
+        devicePixelRatio,
         2
     )
 );
 
-
-renderer.shadowMap.enabled =
-    true;
-
+renderer.shadowMap.enabled=true;
 
 document
     .getElementById("game")
@@ -561,770 +464,782 @@ document
     );
 
 
-/* ==========================================
+/* =====================================================
    LIGHTING
-========================================== */
+===================================================== */
 
-const ambientLight =
+const ambient=
     new THREE.HemisphereLight(
-        0xffffff,
-        0x566b48,
-        1.7
+        0xcfe8ff,
+        0x263522,
+        1.8
     );
 
-
 scene.add(
-    ambientLight
+    ambient
 );
 
 
-const sun =
+const sun=
     new THREE.DirectionalLight(
         0xffffff,
         2
     );
 
-
 sun.position.set(
     150,
     300,
-    100
+    120
 );
 
-
-sun.castShadow =
-    true;
-
-
-sun.shadow.mapSize.width =
-    2048;
-
-
-sun.shadow.mapSize.height =
-    2048;
-
+sun.castShadow=true;
 
 scene.add(
     sun
 );
 
 
-/* ==========================================
+/* =====================================================
+   MATERIAL HELPER
+===================================================== */
+
+function material(
+    color,
+    roughness=.8,
+    metalness=0
+){
+
+    return new THREE.MeshStandardMaterial({
+        color:color,
+        roughness:roughness,
+        metalness:metalness
+    });
+
+}
+
+
+/* =====================================================
+   BOX HELPER
+===================================================== */
+
+function createBox(
+    width,
+    height,
+    depth,
+    color
+){
+
+    const mesh=
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                width,
+                height,
+                depth
+            ),
+            material(color)
+        );
+
+    mesh.castShadow=true;
+    mesh.receiveShadow=true;
+
+    return mesh;
+
+}
+
+
+/* =====================================================
    GROUND
-========================================== */
+===================================================== */
 
-const ground =
-    new THREE.Mesh(
-
-        new THREE.PlaneGeometry(
-            WORLD_SIZE,
-            WORLD_SIZE
-        ),
-
-        new THREE.MeshStandardMaterial({
-            color:0x3e7142
-        })
-
+const ground=
+    createBox(
+        WORLD_SIZE,
+        .4,
+        WORLD_SIZE,
+        0x4c7b45
     );
 
-
-ground.rotation.x =
-    -Math.PI/2;
-
-
-ground.receiveShadow =
-    true;
-
+ground.position.y=-.2;
 
 scene.add(
     ground
 );
 
 
-/* ==========================================
-   ROAD MATERIALS
-========================================== */
+/* =====================================================
+   ROADS
+===================================================== */
 
-const roadMaterial =
-    new THREE.MeshStandardMaterial({
-        color:0x292b2d
-    });
-
-
-const sidewalkMaterial =
-    new THREE.MeshStandardMaterial({
-        color:0x777777
-    });
-
-
-const lineMaterial =
-    new THREE.MeshBasicMaterial({
-        color:0xe7d85b
-    });
-
-
-/* ==========================================
-   ROAD CREATION
-========================================== */
-
-function createRoadX(
-    z
-){
-
-    const road =
-        new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                WORLD_SIZE,
-                .08,
-                ROAD_WIDTH
-            ),
-
-            roadMaterial
-
-        );
-
-
-    road.position.set(
-        0,
-        .04,
-        z
-    );
-
-
-    scene.add(
-        road
-    );
-
-
-    /* sidewalks */
-
-    const sidewalk1 =
-        new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                WORLD_SIZE,
-                .12,
-                5
-            ),
-
-            sidewalkMaterial
-
-        );
-
-
-    sidewalk1.position.set(
-        0,
-        .10,
-        z - ROAD_WIDTH/2 - 2.5
-    );
-
-
-    scene.add(
-        sidewalk1
-    );
-
-
-    const sidewalk2 =
-        sidewalk1.clone();
-
-
-    sidewalk2.position.z =
-        z +
-        ROAD_WIDTH/2 +
-        2.5;
-
-
-    scene.add(
-        sidewalk2
-    );
-
-
-    /* road markings */
+function createRoadNetwork(){
 
     for(
-        let x=-WORLD_SIZE/2;
-        x<WORLD_SIZE/2;
-        x+=18
+        const p of roadPositions
     ){
 
-        const line =
-            new THREE.Mesh(
+        const horizontal=
+            createBox(
+                WORLD_SIZE,
+                .12,
+                ROAD_SIZE,
+                0x292d31
+            );
 
-                new THREE.BoxGeometry(
+        horizontal.position.set(
+            0,
+            .03,
+            p
+        );
+
+        scene.add(
+            horizontal
+        );
+
+
+        const vertical=
+            createBox(
+                ROAD_SIZE,
+                .12,
+                WORLD_SIZE,
+                0x292d31
+            );
+
+        vertical.position.set(
+            p,
+            .035,
+            0
+        );
+
+        scene.add(
+            vertical
+        );
+
+
+        /* SIDEWALKS */
+
+        const sideA=
+            createBox(
+                WORLD_SIZE,
+                .22,
+                SIDEWALK_SIZE,
+                0xb4b0a7
+            );
+
+        sideA.position.set(
+            0,
+            .15,
+            p-ROAD_SIZE/2-SIDEWALK_SIZE/2
+        );
+
+        scene.add(
+            sideA
+        );
+
+
+        const sideB=
+            sideA.clone();
+
+        sideB.position.z=
+            p+ROAD_SIZE/2+SIDEWALK_SIZE/2;
+
+        scene.add(
+            sideB
+        );
+
+
+        const sideC=
+            createBox(
+                SIDEWALK_SIZE,
+                .22,
+                WORLD_SIZE,
+                0xb4b0a7
+            );
+
+        sideC.position.set(
+            p-ROAD_SIZE/2-SIDEWALK_SIZE/2,
+            .16,
+            0
+        );
+
+        scene.add(
+            sideC
+        );
+
+
+        const sideD=
+            sideC.clone();
+
+        sideD.position.x=
+            p+ROAD_SIZE/2+SIDEWALK_SIZE/2;
+
+        scene.add(
+            sideD
+        );
+
+
+        /* ROAD LINES */
+
+        for(
+            let i=-480;
+            i<480;
+            i+=20
+        ){
+
+            const line=
+                createBox(
                     9,
-                    .09,
-                    .18
-                ),
-
-                lineMaterial
-
-            );
-
-
-        line.position.set(
-            x,
-            .11,
-            z
-        );
-
-
-        scene.add(
-            line
-        );
-
-    }
-
-}
-
-
-/* ==========================================
-   ROAD CREATION Z
-========================================== */
-
-function createRoadZ(
-    x
-){
-
-    const road =
-        new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                ROAD_WIDTH,
-                .08,
-                WORLD_SIZE
-            ),
-
-            roadMaterial
-
-        );
-
-
-    road.position.set(
-        x,
-        .04,
-        0
-    );
-
-
-    scene.add(
-        road
-    );
-
-
-    /* sidewalks */
-
-    const sidewalk1 =
-        new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                5,
-                .12,
-                WORLD_SIZE
-            ),
-
-            sidewalkMaterial
-
-        );
-
-
-    sidewalk1.position.set(
-        x - ROAD_WIDTH/2 - 2.5,
-        .10,
-        0
-    );
-
-
-    scene.add(
-        sidewalk1
-    );
-
-
-    const sidewalk2 =
-        sidewalk1.clone();
-
-
-    sidewalk2.position.x =
-        x +
-        ROAD_WIDTH/2 +
-        2.5;
-
-
-    scene.add(
-        sidewalk2
-    );
-
-
-    /* road markings */
-
-    for(
-        let z=-WORLD_SIZE/2;
-        z<WORLD_SIZE/2;
-        z+=18
-    ){
-
-        const line =
-            new THREE.Mesh(
-
-                new THREE.BoxGeometry(
+                    .035,
                     .18,
-                    .09,
-                    9
-                ),
+                    0xe6dca8
+                );
 
-                lineMaterial
+            line.position.set(
+                i,
+                .11,
+                p
+            );
 
+            scene.add(
+                line
             );
 
 
-        line.position.set(
-            x,
-            .11,
-            z
-        );
+            const line2=
+                createBox(
+                    .18,
+                    .035,
+                    9,
+                    0xe6dca8
+                );
 
+            line2.position.set(
+                p,
+                .12,
+                i
+            );
 
-        scene.add(
-            line
-        );
+            scene.add(
+                line2
+            );
+
+        }
 
     }
 
 }
 
-
-/* ==========================================
-   CITY ROAD NETWORK
-========================================== */
-
-/*
-   IMPORTANT:
-   These roads run ALL the way across
-   the map. Buildings will NEVER be
-   placed on these road corridors.
-*/
-
-const roadPositions = [
-    -320,
-    -240,
-    -160,
-    -80,
-    0,
-    80,
-    160,
-    240,
-    320
-];
+createRoadNetwork();
 
 
-roadPositions.forEach(
-    z => {
+/* =====================================================
+   CROSSWALKS
+===================================================== */
 
-        createRoadX(
-            z
-        );
-
-    }
-);
-
-
-roadPositions.forEach(
-    x => {
-
-        createRoadZ(
-            x
-        );
-
-    }
-);
-
-
-/* ==========================================
-   BUILDING MATERIALS
-========================================== */
-
-const buildingMaterials = [
-
-    new THREE.MeshStandardMaterial({
-        color:0x8b7d72
-    }),
-
-    new THREE.MeshStandardMaterial({
-        color:0x6c7480
-    }),
-
-    new THREE.MeshStandardMaterial({
-        color:0x987c63
-    }),
-
-    new THREE.MeshStandardMaterial({
-        color:0x52626b
-    }),
-
-    new THREE.MeshStandardMaterial({
-        color:0x795b50
-    })
-
-];
-
-
-/* ==========================================
-   BUILDING TEST
-========================================== */
-
-function isRoadArea(
+function createCrosswalk(
     x,
     z
 ){
 
     for(
-        const road of roadPositions
+        let i=-3;
+        i<=3;
+        i++
+    ){
+
+        const a=
+            createBox(
+                2.5,
+                .035,
+                .8,
+                0xffffff
+            );
+
+        a.position.set(
+            x+i*3,
+            .2,
+            z-ROAD_SIZE/2-1
+        );
+
+        scene.add(a);
+
+
+        const b=a.clone();
+
+        b.position.z=
+            z+ROAD_SIZE/2+1;
+
+        scene.add(b);
+
+
+        const c=
+            createBox(
+                .8,
+                .035,
+                2.5,
+                0xffffff
+            );
+
+        c.position.set(
+            x-ROAD_SIZE/2-1,
+            .21,
+            z+i*3
+        );
+
+        scene.add(c);
+
+
+        const d=c.clone();
+
+        d.position.x=
+            x+ROAD_SIZE/2+1;
+
+        scene.add(d);
+
+    }
+
+}
+
+
+for(
+    const x of roadPositions
+){
+
+    for(
+        const z of roadPositions
     ){
 
         if(
-            Math.abs(
-                x - road
-            ) <
-            ROAD_WIDTH/2 + 8
+            Math.abs(x)<400 &&
+            Math.abs(z)<400
         ){
 
-            return true;
-
-        }
-
-
-        if(
-            Math.abs(
-                z - road
-            ) <
-            ROAD_WIDTH/2 + 8
-        ){
-
-            return true;
+            createCrosswalk(
+                x,
+                z
+            );
 
         }
 
     }
 
-
-    return false;
-
 }
 
 
-/* ==========================================
-   CREATE BUILDING
-========================================== */
+/* =====================================================
+   BUILDINGS
+===================================================== */
+
+const buildingColors=[
+    0x68757b,
+    0x756b62,
+    0x596a76,
+    0x80776d,
+    0x56656c,
+    0x706f74
+];
+
 
 function createBuilding(
     x,
     z,
     width,
     depth,
-    height
+    height,
+    color
 ){
 
-    /*
-       Absolute protection:
-       Buildings cannot be created
-       on roads.
-    */
-
-    if(
-        isRoadArea(
-            x,
-            z
-        )
-    ){
-
-        return;
-
-    }
+    const group=
+        new THREE.Group();
 
 
-    const material =
-        buildingMaterials[
-            Math.floor(
-                Math.random() *
-                buildingMaterials.length
-            )
-        ];
-
-
-    const building =
-        new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                width,
-                height,
-                depth
-            ),
-
-            material
-
+    const building=
+        createBox(
+            width,
+            height,
+            depth,
+            color
         );
 
+    building.position.y=
+        height/2;
 
-    building.position.set(
-        x,
-        height/2,
-        z
-    );
-
-
-    building.castShadow =
-        true;
-
-
-    building.receiveShadow =
-        true;
-
-
-    scene.add(
+    group.add(
         building
     );
 
 
-    /* windows */
-
-    const windowMaterial =
-        new THREE.MeshBasicMaterial({
-            color:0x9ec5d8
-        });
-
-
-    const windowRows =
-        Math.max(
-            1,
-            Math.floor(
-                height/4
-            )
+    const roof=
+        createBox(
+            width+1,
+            .7,
+            depth+1,
+            0x303236
         );
 
+    roof.position.y=
+        height+.35;
 
-    const windowColumns =
-        Math.max(
-            2,
-            Math.floor(
-                width/5
-            )
-        );
+    group.add(
+        roof
+    );
 
+
+    /* WINDOWS */
 
     for(
-        let row=0;
-        row<windowRows;
-        row++
+        let y=3;
+        y<height-1;
+        y+=3
     ){
 
         for(
-            let col=0;
-            col<windowColumns;
-            col++
+            let xx=-width/2+3;
+            xx<width/2-2;
+            xx+=5
         ){
 
-            const windowMesh =
-                new THREE.Mesh(
-
-                    new THREE.BoxGeometry(
-                        1.4,
-                        1.2,
-                        .08
-                    ),
-
-                    windowMaterial
-
+            const window=
+                createBox(
+                    2,
+                    1.2,
+                    .08,
+                    0x7faeba
                 );
 
+            window.position.set(
+                xx,
+                y,
+                depth/2+.06
+            );
 
-            const wx =
-                x -
-                width/2 +
-                2.5 +
-                col*4.5;
-
-
-            const wy =
-                2 +
-                row*4;
-
-
-            const wz =
-                z -
-                depth/2 -
-                .05;
-
-
-            windowMesh.position.set(
-                wx,
-                wy,
-                wz
+            group.add(
+                window
             );
 
 
-            scene.add(
-                windowMesh
+            const back=
+                window.clone();
+
+            back.position.z=
+                -depth/2-.06;
+
+            group.add(
+                back
             );
 
         }
 
     }
 
-}
 
-
-/* ==========================================
-   CITY BLOCKS
-========================================== */
-
-function generateCity(){
-
-    /*
-       Each block sits BETWEEN roads.
-       Therefore every road remains open.
-    */
-
-    for(
-        let ix=0;
-        ix<roadPositions.length-1;
-        ix++
-    ){
-
-        for(
-            let iz=0;
-            iz<roadPositions.length-1;
-            iz++
-        ){
-
-            const x1 =
-                roadPositions[ix];
-
-
-            const x2 =
-                roadPositions[ix+1];
-
-
-            const z1 =
-                roadPositions[iz];
-
-
-            const z2 =
-                roadPositions[iz+1];
-
-
-            const centerX =
-                (x1+x2)/2;
-
-
-            const centerZ =
-                (z1+z2)/2;
-
-
-            const blockWidth =
-                Math.abs(
-                    x2-x1
-                ) -
-                ROAD_WIDTH -
-                18;
-
-
-            const blockDepth =
-                Math.abs(
-                    z2-z1
-                ) -
-                ROAD_WIDTH -
-                18;
-
-
-            /*
-               One or two buildings per block.
-            */
-
-            const split =
-                Math.random();
-
-
-            if(
-                split < .55
-            ){
-
-                createBuilding(
-                    centerX -
-                    blockWidth*.18,
-                    centerZ,
-                    blockWidth*.48,
-                    blockDepth*.75,
-                    12 +
-                    Math.random()*30
-                );
-
-
-                createBuilding(
-                    centerX +
-                    blockWidth*.22,
-                    centerZ,
-                    blockWidth*.35,
-                    blockDepth*.55,
-                    8 +
-                    Math.random()*22
-                );
-
-            }
-            else{
-
-                createBuilding(
-                    centerX,
-                    centerZ,
-                    blockWidth*.78,
-                    blockDepth*.72,
-                    10 +
-                    Math.random()*35
-                );
-
-            }
-
-        }
-
-    }
-
-}
-
-
-generateCity();
-
-
-/* ==========================================
-   CITY PARK
-========================================== */
-
-function createPark(
-    x,
-    z,
-    size
-){
-
-    const park =
-        new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                size,
-                .15,
-                size
-            ),
-
-            new THREE.MeshStandardMaterial({
-                color:0x43804a
-            })
-
-        );
-
-
-    park.position.set(
+    group.position.set(
         x,
-        .08,
+        0,
         z
     );
 
+    scene.add(
+        group
+    );
+
+}
+
+
+/* =====================================================
+   CITY BLOCKS
+===================================================== */
+
+for(
+    let ix=0;
+    ix<10;
+    ix++
+){
+
+    for(
+        let iz=0;
+        iz<10;
+        iz++
+    ){
+
+        const x=
+            -405+
+            ix*90;
+
+        const z=
+            -405+
+            iz*90;
+
+
+        if(
+            Math.abs(x)<45 ||
+            Math.abs(z)<45
+        ){
+
+            continue;
+
+        }
+
+
+        const width=
+            48+
+            Math.random()*18;
+
+        const depth=
+            45+
+            Math.random()*18;
+
+        const height=
+            18+
+            Math.random()*38;
+
+
+        createBuilding(
+            x,
+            z,
+            width,
+            depth,
+            height,
+            buildingColors[
+                (ix+iz)%
+                buildingColors.length
+            ]
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   DISTRICTS
+===================================================== */
+
+const districts=[
+
+    {
+        name:"DOWNTOWN",
+        x:0,
+        z:0
+    },
+
+    {
+        name:"WESTSIDE",
+        x:-225,
+        z:-225
+    },
+
+    {
+        name:"EASTSIDE",
+        x:225,
+        z:-225
+    },
+
+    {
+        name:"HARBOR",
+        x:-225,
+        z:225
+    },
+
+    {
+        name:"UPTOWN",
+        x:225,
+        z:225
+    },
+
+    {
+        name:"SUBURBS",
+        x:0,
+        z:360
+    }
+
+];
+
+
+function getDistrict(
+    x,
+    z
+){
+
+    if(
+        Math.abs(x)<120 &&
+        Math.abs(z)<120
+    ){
+        return "DOWNTOWN";
+    }
+
+    if(
+        x<-120 &&
+        z<-120
+    ){
+        return "WESTSIDE";
+    }
+
+    if(
+        x>120 &&
+        z<-120
+    ){
+        return "EASTSIDE";
+    }
+
+    if(
+        x<-120 &&
+        z>120
+    ){
+        return "HARBOR";
+    }
+
+    if(
+        x>120 &&
+        z>120
+    ){
+        return "UPTOWN";
+    }
+
+    return "SUBURBS";
+
+}
+
+
+/* =====================================================
+   TEXT SPRITE
+===================================================== */
+
+function createTextSprite(
+    text
+){
+
+    const canvas=
+        document.createElement(
+            "canvas"
+        );
+
+    canvas.width=800;
+    canvas.height=180;
+
+
+    const ctx=
+        canvas.getContext(
+            "2d"
+        );
+
+
+    ctx.clearRect(
+        0,
+        0,
+        800,
+        180
+    );
+
+
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+
+    ctx.font=
+        "bold 70px Arial";
+
+    ctx.fillStyle=
+        "white";
+
+    ctx.strokeStyle=
+        "black";
+
+    ctx.lineWidth=12;
+
+
+    ctx.strokeText(
+        text,
+        400,
+        90
+    );
+
+    ctx.fillText(
+        text,
+        400,
+        90
+    );
+
+
+    const texture=
+        new THREE.CanvasTexture(
+            canvas
+        );
+
+
+    const sprite=
+        new THREE.Sprite(
+            new THREE.SpriteMaterial({
+                map:texture,
+                transparent:true,
+                depthWrite:false
+            })
+        );
+
+
+    sprite.scale.set(
+        20,
+        4.5,
+        1
+    );
+
+
+    return sprite;
+
+}
+
+
+/* =====================================================
+   DISTRICT SIGNS
+===================================================== */
+
+districts.forEach(
+    district=>{
+
+        const sign=
+            createTextSprite(
+                district.name
+            );
+
+        sign.position.set(
+            district.x,
+            22,
+            district.z
+        );
+
+        sign.scale.set(
+            32,
+            7,
+            1
+        );
+
+        scene.add(
+            sign
+        );
+
+    }
+);
+
+
+/* =====================================================
+   PARK
+===================================================== */
+
+function createPark(
+    x,
+    z
+){
+
+    const park=
+        createBox(
+            62,
+            .2,
+            62,
+            0x347a3e
+        );
+
+    park.position.set(
+        x,
+        .1,
+        z
+    );
 
     scene.add(
         park
@@ -1333,79 +1248,46 @@ function createPark(
 
     for(
         let i=0;
-        i<10;
+        i<15;
         i++
     ){
 
-        const tree =
-            new THREE.Group();
-
-
-        const trunk =
-            new THREE.Mesh(
-
-                new THREE.CylinderGeometry(
-                    .35,
-                    .45,
-                    3,
-                    8
-                ),
-
-                new THREE.MeshStandardMaterial({
-                    color:0x68442c
-                })
-
+        const trunk=
+            createBox(
+                .8,
+                4,
+                .8,
+                0x68452e
             );
 
+        trunk.position.set(
+            x+(Math.random()-.5)*50,
+            2,
+            z+(Math.random()-.5)*50
+        );
 
-        trunk.position.y =
-            1.5;
-
-
-        tree.add(
+        scene.add(
             trunk
         );
 
 
-        const leaves =
+        const tree=
             new THREE.Mesh(
-
                 new THREE.SphereGeometry(
-                    1.8,
-                    10,
+                    3.5,
+                    12,
                     10
                 ),
-
-                new THREE.MeshStandardMaterial({
-                    color:0x246b32
-                })
-
+                material(0x267339)
             );
 
-
-        leaves.position.y =
-            4;
-
-
-        tree.add(
-            leaves
-        );
-
-
         tree.position.set(
-
-            x +
-            (Math.random()-.5) *
-            (size-8),
-
-            0,
-
-            z +
-            (Math.random()-.5) *
-            (size-8)
-
+            trunk.position.x,
+            6,
+            trunk.position.z
         );
 
+        tree.castShadow=true;
 
         scene.add(
             tree
@@ -1415,284 +1297,265 @@ function createPark(
 
 }
 
+
 createPark(
-    -120,
-    -120,
-    45
+    135,
+    -135
 );
 
 createPark(
-    120,
-    120,
-    45
+    -315,
+    315
 );
 
 
+/* =====================================================
+   PARKING
+===================================================== */
 
-const skinMaterial =
-    new THREE.MeshStandardMaterial({
-        color:0xc68663
-    });
+function createParking(
+    x,
+    z
+){
 
-const shirtMaterial =
-    new THREE.MeshStandardMaterial({
-        color:0x24558c
-    });
+    const parking=
+        createBox(
+            65,
+            .12,
+            42,
+            0x34373a
+        );
 
-const pantsMaterial =
-    new THREE.MeshStandardMaterial({
-        color:0x20242a
-    });
+    parking.position.set(
+        x,
+        .05,
+        z
+    );
 
-const shoeMaterial =
-    new THREE.MeshStandardMaterial({
-        color:0x111111
-    });
+    scene.add(
+        parking
+    );
 
+
+    for(
+        let i=-25;
+        i<=25;
+        i+=10
+    ){
+
+        const line=
+            createBox(
+                .15,
+                .03,
+                37,
+                0xe5e5e5
+            );
+
+        line.position.set(
+            x+i,
+            .13,
+            z
+        );
+
+        scene.add(
+            line
+        );
+
+    }
+
+}
+
+
+createParking(
+    315,
+    135
+);
+
+createParking(
+    -315,
+    -45
+);
+
+
+/* =====================================================
+   PLAYER
+===================================================== */
 
 function createPlayer(){
 
-    const group =
+    const group=
         new THREE.Group();
 
 
-    /* BODY */
+    const skin=
+        material(0xc68663);
 
-    const body =
-        new THREE.Mesh(
+    const shirt=
+        material(0x24558c);
 
-            new THREE.BoxGeometry(
-                .9,
-                1.35,
-                .52
-            ),
+    const pants=
+        material(0x22252a);
 
-            shirtMaterial
+    const shoes=
+        material(0x111111);
+
+
+    const body=
+        createBox(
+            1,
+            1.35,
+            .55,
+            0x24558c
         );
 
-
-    body.position.y =
+    body.position.y=
         2.15;
 
-
-    body.castShadow =
-        true;
+    group.add(body);
 
 
-    group.add(
-        body
-    );
-
-
-    /* HEAD */
-
-    const head =
+    const head=
         new THREE.Mesh(
-
             new THREE.SphereGeometry(
-                .36,
+                .38,
                 16,
                 16
             ),
-
-            skinMaterial
+            skin
         );
 
+    head.position.y=
+        3.2;
 
-    head.position.y =
-        3.15;
+    head.castShadow=true;
 
-
-    head.castShadow =
-        true;
-
-
-    group.add(
-        head
-    );
+    group.add(head);
 
 
-    /* NECK */
-
-    const neck =
+    const neck=
         new THREE.Mesh(
-
             new THREE.CylinderGeometry(
-                .13,
-                .13,
+                .14,
+                .14,
                 .25,
                 10
             ),
-
-            skinMaterial
+            skin
         );
 
+    neck.position.y=
+        2.75;
 
-    neck.position.y =
-        2.72;
-
-
-    group.add(
-        neck
-    );
+    group.add(neck);
 
 
-    /* LEFT ARM */
-
-    const leftArm =
+    const leftArm=
         new THREE.Mesh(
-
             new THREE.CylinderGeometry(
-                .13,
-                .11,
+                .14,
+                .12,
                 1.25,
                 10
             ),
-
-            shirtMaterial
+            shirt
         );
 
-
     leftArm.position.set(
-        -.6,
+        -.62,
         2.15,
         0
     );
 
-
-    leftArm.rotation.z =
-        -.08;
+    group.add(leftArm);
 
 
-    leftArm.castShadow =
-        true;
-
-
-    group.add(
-        leftArm
-    );
-
-
-    /* RIGHT ARM */
-
-    const rightArm =
+    const rightArm=
         leftArm.clone();
 
+    rightArm.position.x=
+        .62;
 
-    rightArm.position.x =
-        .6;
-
-
-    rightArm.rotation.z =
-        .08;
+    group.add(rightArm);
 
 
-    group.add(
-        rightArm
-    );
-
-
-    /* LEFT LEG */
-
-    const leftLeg =
+    const leftLeg=
         new THREE.Mesh(
-
             new THREE.CylinderGeometry(
                 .16,
                 .14,
                 1.45,
                 10
             ),
-
-            pantsMaterial
+            pants
         );
 
-
     leftLeg.position.set(
-        -.23,
+        -.25,
         .75,
         0
     );
 
-
-    leftLeg.castShadow =
-        true;
+    group.add(leftLeg);
 
 
-    group.add(
-        leftLeg
-    );
-
-
-    /* RIGHT LEG */
-
-    const rightLeg =
+    const rightLeg=
         leftLeg.clone();
 
+    rightLeg.position.x=
+        .25;
 
-    rightLeg.position.x =
-        .23;
-
-
-    group.add(
-        rightLeg
-    );
+    group.add(rightLeg);
 
 
-    /* SHOES */
-
-    const leftShoe =
-        new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                .32,
-                .16,
-                .6
-            ),
-
-            shoeMaterial
+    const leftShoe=
+        createBox(
+            .35,
+            .18,
+            .65,
+            0x111111
         );
 
-
     leftShoe.position.set(
-        -.23,
+        -.25,
         .05,
         -.12
     );
 
-
-    group.add(
-        leftShoe
-    );
+    group.add(leftShoe);
 
 
-    const rightShoe =
+    const rightShoe=
         leftShoe.clone();
 
+    rightShoe.position.x=
+        .25;
 
-    rightShoe.position.x =
-        .23;
+    group.add(rightShoe);
 
 
-    group.add(
-        rightShoe
+    group.userData={
+        leftArm:leftArm,
+        rightArm:rightArm,
+        leftLeg:leftLeg,
+        rightLeg:rightLeg,
+        walkTime:0
+    };
+
+
+    group.traverse(
+        object=>{
+
+            if(
+                object.isMesh
+            ){
+
+                object.castShadow=true;
+                object.receiveShadow=true;
+
+            }
+
+        }
     );
-
-
-    group.userData.leftArm =
-        leftArm;
-
-    group.userData.rightArm =
-        rightArm;
-
-    group.userData.leftLeg =
-        leftLeg;
-
-    group.userData.rightLeg =
-        rightLeg;
-
-    group.userData.walkTime =
-        0;
 
 
     return group;
@@ -1700,295 +1563,215 @@ function createPlayer(){
 }
 
 
-playerGroup =
-    createPlayer();
-
-
-player =
-    playerGroup;
-
-
-playerGroup.position.set(
-    0,
-    0,
-    35
-);
-
+playerGroup=
+    new THREE.Group();
 
 scene.add(
     playerGroup
 );
 
 
-/* ==========================================
-   CAR CREATION
-========================================== */
+player=
+    createPlayer();
+
+playerGroup.add(
+    player
+);
+
+
+playerGroup.position.set(
+    0,
+    0,
+    40
+);
+
+
+/* =====================================================
+   BASIC CAR — REAL 3D SHAPE
+===================================================== */
 
 function createCar(
-    bodyColor,
-    roofColor
+    color=0x1764a5,
+    police=false
 ){
 
-    const group =
+    const group=
         new THREE.Group();
 
 
-    const bodyMaterial =
-        new THREE.MeshStandardMaterial({
-            color:bodyColor,
-            metalness:.35,
-            roughness:.45
-        });
-
-
-    const roofMaterial =
-        new THREE.MeshStandardMaterial({
-            color:roofColor,
-            metalness:.25,
-            roughness:.5
-        });
-
-
-    /* MAIN BODY */
-
-    const body =
-        new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                4.4,
-                1.15,
-                8
-            ),
-
-            bodyMaterial
+    const body=
+        createBox(
+            4.1,
+            1.05,
+            7.4,
+            color
         );
 
-
-    body.position.y =
+    body.position.y=
         1.05;
 
-
-    body.castShadow =
-        true;
+    group.add(body);
 
 
-    group.add(
-        body
-    );
-
-
-    /* HOOD */
-
-    const hood =
-        new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                4.1,
-                .45,
-                2.1
-            ),
-
-            bodyMaterial
+    const hood=
+        createBox(
+            3.8,
+            .35,
+            1.8,
+            color
         );
-
 
     hood.position.set(
         0,
-        1.55,
-        -2.45
+        1.58,
+        -2.65
     );
 
-
-    group.add(
-        hood
-    );
+    group.add(hood);
 
 
-    /* ROOF */
-
-    const roof =
-        new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                3.5,
-                1.15,
-                3.4
-            ),
-
-            roofMaterial
+    const cabin=
+        createBox(
+            3.2,
+            1.35,
+            3.5,
+            0x27333b
         );
 
-
-    roof.position.set(
+    cabin.position.set(
         0,
         2.05,
-        .55
+        .45
     );
 
-
-    roof.castShadow =
-        true;
+    group.add(cabin);
 
 
-    group.add(
-        roof
-    );
-
-
-    /* WINDOWS */
-
-    const glassMaterial =
-        new THREE.MeshStandardMaterial({
-            color:0x182b38,
-            metalness:.2,
-            roughness:.15
-        });
-
-
-    const frontWindow =
-        new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                3.05,
-                .75,
-                .12
-            ),
-
-            glassMaterial
+    const glass=
+        material(
+            0x162d3a,
+            .15,
+            .2
         );
 
 
-    frontWindow.position.set(
+    const windshield=
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                2.9,
+                .75,
+                .1
+            ),
+            glass
+        );
+
+    windshield.position.set(
         0,
-        2.08,
-        -1.18
+        2.2,
+        -1.35
     );
 
-
-    frontWindow.rotation.x =
+    windshield.rotation.x=
         -.12;
 
-
     group.add(
-        frontWindow
+        windshield
     );
 
 
-    const rearWindow =
-        frontWindow.clone();
+    const rearGlass=
+        windshield.clone();
 
+    rearGlass.position.z=
+        2.2;
 
-    rearWindow.position.z =
-        2.25;
-
-
-    rearWindow.rotation.x =
+    rearGlass.rotation.x=
         .12;
 
-
     group.add(
-        rearWindow
-    );
-
-
-    /* SIDE WINDOWS */
-
-    const sideWindow =
-        new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                .12,
-                .75,
-                2.25
-            ),
-
-            glassMaterial
-        );
-
-
-    sideWindow.position.set(
-        1.76,
-        2.08,
-        .55
-    );
-
-
-    group.add(
-        sideWindow
-    );
-
-
-    const otherSideWindow =
-        sideWindow.clone();
-
-
-    otherSideWindow.position.x =
-        -1.76;
-
-
-    group.add(
-        otherSideWindow
+        rearGlass
     );
 
 
     /* WHEELS */
 
-    const wheels = [];
+    const wheelMaterial=
+        material(0x101010);
 
-    const wheelPositions = [
+    const rimMaterial=
+        material(
+            0xb9bdc1,
+            .25,
+            .7
+        );
 
-        [-2.05,.62,-2.55],
-        [ 2.05,.62,-2.55],
-        [-2.05,.62, 2.55],
-        [ 2.05,.62, 2.55]
 
+    const wheels=[];
+
+
+    const positions=[
+        [-1.95,.65,-2.45],
+        [1.95,.65,-2.45],
+        [-1.95,.65,2.45],
+        [1.95,.65,2.45]
     ];
 
 
-    wheelPositions.forEach(
-        position => {
+    positions.forEach(
+        pos=>{
 
-            const wheelGroup =
+            const wheelGroup=
                 new THREE.Group();
 
 
-            const tire =
+            const tire=
                 new THREE.Mesh(
-
                     new THREE.CylinderGeometry(
-                        .72,
-                        .72,
-                        .42,
-                        16
+                        .68,
+                        .68,
+                        .45,
+                        20
                     ),
-
-                    new THREE.MeshStandardMaterial({
-                        color:0x111111
-                    })
-
+                    wheelMaterial
                 );
 
-
-            tire.rotation.z =
+            tire.rotation.z=
                 Math.PI/2;
-
 
             wheelGroup.add(
                 tire
             );
 
 
+            const rim=
+                new THREE.Mesh(
+                    new THREE.CylinderGeometry(
+                        .28,
+                        .28,
+                        .47,
+                        14
+                    ),
+                    rimMaterial
+                );
+
+            rim.rotation.z=
+                Math.PI/2;
+
+            wheelGroup.add(
+                rim
+            );
+
+
             wheelGroup.position.set(
-                position[0],
-                position[1],
-                position[2]
+                pos[0],
+                pos[1],
+                pos[2]
             );
 
 
             group.add(
                 wheelGroup
             );
-
 
             wheels.push(
                 wheelGroup
@@ -2000,76 +1783,50 @@ function createCar(
 
     /* LIGHTS */
 
-    const headlightMaterial =
-        new THREE.MeshBasicMaterial({
-            color:0xffffcc
-        });
+    for(
+        const x of [-1.2,1.2]
+    ){
 
-
-    const redLightMaterial =
-        new THREE.MeshBasicMaterial({
-            color:0xff2020
-        });
-
-
-    [-1.25,1.25].forEach(
-        x => {
-
-            const light =
-                new THREE.Mesh(
-
-                    new THREE.BoxGeometry(
-                        .7,
-                        .35,
-                        .12
-                    ),
-
-                    headlightMaterial
-                );
-
-
-            light.position.set(
-                x,
-                1.2,
-                -4.02
+        const front=
+            createBox(
+                .65,
+                .3,
+                .12,
+                0xfff0b0
             );
 
+        front.position.set(
+            x,
+            1.18,
+            -3.76
+        );
 
-            group.add(
-                light
+        group.add(front);
+
+
+        const rear=
+            createBox(
+                .65,
+                .3,
+                .12,
+                0xd52626
             );
 
+        rear.position.set(
+            x,
+            1.18,
+            3.76
+        );
 
-            const rearLight =
-                new THREE.Mesh(
+        group.add(rear);
 
-                    new THREE.BoxGeometry(
-                        .7,
-                        .35,
-                        .12
-                    ),
-
-                    redLightMaterial
-                );
+    }
 
 
-            rearLight.position.set(
-                x,
-                1.2,
-                4.02
-            );
-
-
-            group.add(
-                rearLight
-            );
-
-        }
-    );
-
-
-    group.userData.wheels =
-        wheels;
+    group.userData={
+        wheels:wheels,
+        police:police
+    };
 
 
     return group;
@@ -2077,16 +1834,15 @@ function createCar(
 }
 
 
-/* ==========================================
+/* =====================================================
    PLAYER CAR
-========================================== */
+===================================================== */
 
-car =
+car=
     createCar(
-        0x174a9c,
-        0x101820
+        0x185ca8,
+        false
     );
-
 
 car.position.set(
     0,
@@ -2094,144 +1850,112 @@ car.position.set(
     15
 );
 
-
-car.rotation.y =
-    Math.PI;
-
-
 scene.add(
     car
 );
 
 
-/* ==========================================
-   TRAFFIC CAR SPAWN
-========================================== */
+/* =====================================================
+   INITIAL TRAFFIC
+===================================================== */
 
-const trafficColors = [
-
-    0xd32f2f,
-    0xf2c94c,
-    0xeeeeee,
-    0x212121,
-    0x2e7d32,
-    0x7b1fa2,
-    0x1565c0,
-    0xef6c00
-
+const trafficColors=[
+    0xd63b3b,
+    0xe0ad31,
+    0xe7e7e7,
+    0x252525,
+    0x2f873f,
+    0x6748b8,
+    0x1769ad,
+    0xd87827
 ];
 
 
 function spawnTrafficCar(){
 
-    const color =
-        trafficColors[
-            Math.floor(
-                Math.random() *
-                trafficColors.length
-            )
-        ];
-
-
-    const traffic =
+    const traffic=
         createCar(
-            color,
-            0x202020
+            trafficColors[
+                Math.floor(
+                    Math.random()*
+                    trafficColors.length
+                )
+            ]
         );
 
 
-    const horizontal =
-        Math.random() <
-        .5;
+    const horizontal=
+        Math.random()<.5;
 
 
-    const road =
+    const road=
         roadPositions[
             Math.floor(
-                Math.random() *
+                Math.random()*
                 roadPositions.length
             )
         ];
 
 
-    if(
-        horizontal
-    ){
+    if(horizontal){
 
         traffic.position.set(
-
-            (
-                Math.random()-.5
-            ) *
+            (Math.random()-.5)*
             WORLD_SIZE,
 
             0,
 
-            road
-
+            road+
+            (Math.random()<.5?-5:5)
         );
 
 
-        traffic.rotation.y =
-            Math.random() <
-            .5
-            ? 0
-            : Math.PI;
+        traffic.rotation.y=
+            Math.random()<.5
+            ?0
+            :Math.PI;
 
     }
     else{
 
         traffic.position.set(
-
-            road,
+            road+
+            (Math.random()<.5?-5:5),
 
             0,
 
-            (
-                Math.random()-.5
-            ) *
+            (Math.random()-.5)*
             WORLD_SIZE
-
         );
 
 
-        traffic.rotation.y =
-            Math.random() <
-            .5
-            ? Math.PI/2
-            : -Math.PI/2;
+        traffic.rotation.y=
+            Math.random()<.5
+            ?Math.PI/2
+            :-Math.PI/2;
 
     }
 
 
-    traffic.userData.speed =
-        7 +
-        Math.random()*8;
-
-
-    traffic.userData.direction =
-        traffic.rotation.y;
-
-
-    scene.add(
-        traffic
-    );
+    traffic.userData.speed=
+        8+
+        Math.random()*10;
 
 
     trafficCars.push(
         traffic
     );
 
+    scene.add(
+        traffic
+    );
+
 }
 
 
-/* ==========================================
-   INITIAL TRAFFIC
-========================================== */
-
 for(
     let i=0;
-    i<28;
+    i<35;
     i++
 ){
 
@@ -2240,205 +1964,1340 @@ for(
 }
 
 
-/* ==========================================
-   TRAFFIC MOVEMENT
-========================================== */
+/* =====================================================
+   NPC MATERIALS
+===================================================== */
 
-function updateTraffic(
-    dt
-){
+const npcSkinMaterials=[
 
-    trafficCars.forEach(
-        traffic => {
+    material(0xc68663),
+    material(0x9b6047),
+    material(0xe0a17b),
+    material(0x70452f)
 
-            const direction =
-                new THREE.Vector3(
-                    0,
-                    0,
-                    -1
-                );
+];
 
 
-            direction.applyQuaternion(
-                traffic.quaternion
-            );
+const npcShirtMaterials=[
+
+    material(0x24558c),
+    material(0x8b2525),
+    material(0x27733b),
+    material(0x6d4c9b),
+    material(0xd48a24),
+    material(0x333333)
+
+];
 
 
-            traffic.position.add(
-                direction.multiplyScalar(
-                    traffic.userData.speed *
-                    dt
-                )
-            );
+const npcPantsMaterials=[
+
+    material(0x22252a),
+    material(0x394a5b),
+    material(0x4a382d)
+
+];
 
 
-            /*
-               Wrap traffic around map
-               instead of allowing cars to
-               disappear permanently.
-            */
+/* =====================================================
+   NPC CREATION
+===================================================== */
 
-            const limit =
-                WORLD_SIZE/2 +
-                30;
+function createNPC(){
 
+    const npc=
+        new THREE.Group();
+
+
+    const skin=
+        npcSkinMaterials[
+            Math.floor(
+                Math.random()*
+                npcSkinMaterials.length
+            )
+        ];
+
+
+    const shirt=
+        npcShirtMaterials[
+            Math.floor(
+                Math.random()*
+                npcShirtMaterials.length
+            )
+        ];
+
+
+    const pants=
+        npcPantsMaterials[
+            Math.floor(
+                Math.random()*
+                npcPantsMaterials.length
+            )
+        ];
+
+
+    const body=
+        createBox(
+            .8,
+            1.15,
+            .48,
+            shirt.color
+        );
+
+    body.position.y=
+        2.1;
+
+    body.material=shirt;
+
+    npc.add(body);
+
+
+    const head=
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .32,
+                14,
+                14
+            ),
+            skin
+        );
+
+    head.position.y=
+        3;
+
+    npc.add(head);
+
+
+    const leftArm=
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                .11,
+                .10,
+                1,
+                10
+            ),
+            shirt
+        );
+
+    leftArm.position.set(
+        -.55,
+        2.15,
+        0
+    );
+
+    npc.add(leftArm);
+
+
+    const rightArm=
+        leftArm.clone();
+
+    rightArm.position.x=
+        .55;
+
+    npc.add(rightArm);
+
+
+    const leftLeg=
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                .13,
+                .12,
+                1.25,
+                10
+            ),
+            pants
+        );
+
+    leftLeg.position.set(
+        -.22,
+        .85,
+        0
+    );
+
+    npc.add(leftLeg);
+
+
+    const rightLeg=
+        leftLeg.clone();
+
+    rightLeg.position.x=
+        .22;
+
+    npc.add(rightLeg);
+
+
+    npc.userData={
+        leftArm:leftArm,
+        rightArm:rightArm,
+        leftLeg:leftLeg,
+        rightLeg:rightLeg,
+        walkTime:Math.random()*10,
+        speed:1.2+Math.random()*1.2,
+        direction:Math.random()*Math.PI*2,
+        changeDirection:2+Math.random()*5,
+        panic:false
+    };
+
+
+    npc.traverse(
+        object=>{
 
             if(
-                traffic.position.x >
-                limit
+                object.isMesh
             ){
 
-                traffic.position.x =
-                    -limit;
-
-            }
-
-
-            if(
-                traffic.position.x <
-                -limit
-            ){
-
-                traffic.position.x =
-                    limit;
-
-            }
-
-
-            if(
-                traffic.position.z >
-                limit
-            ){
-
-                traffic.position.z =
-                    -limit;
-
-            }
-
-
-            if(
-                traffic.position.z <
-                -limit
-            ){
-
-                traffic.position.z =
-                    limit;
-
-            }
-
-
-            if(
-                traffic.userData.wheels
-            ){
-
-                traffic.userData.wheels
-                    .forEach(
-                        wheel => {
-
-                            wheel.children[0]
-                                .rotation.x +=
-                                traffic.userData.speed *
-                                dt *
-                                1.8;
-
-                        }
-                    );
+                object.castShadow=true;
+                object.receiveShadow=true;
 
             }
 
         }
     );
 
+
+    return npc;
+
 }
 
 
-/* ==========================================
-   POLICE CAR
-========================================== */
+/* =====================================================
+   NPC SPAWN ON SIDEWALKS
+===================================================== */
 
-function createPoliceCar(){
+function spawnNPC(){
 
-    const police =
-        createCar(
-            0xf2f2f2,
+    const npc=
+        createNPC();
+
+
+    const road=
+        roadPositions[
+            Math.floor(
+                Math.random()*
+                roadPositions.length
+            )
+        ];
+
+
+    const horizontal=
+        Math.random()<.5;
+
+
+    if(horizontal){
+
+        npc.position.set(
+            (Math.random()-.5)*
+            WORLD_SIZE,
+            0,
+            road+
+            (Math.random()<.5?-1:1)*
+            (ROAD_SIZE/2+
+            SIDEWALK_SIZE/2)
+        );
+
+    }
+    else{
+
+        npc.position.set(
+            road+
+            (Math.random()<.5?-1:1)*
+            (ROAD_SIZE/2+
+            SIDEWALK_SIZE/2),
+            0,
+            (Math.random()-.5)*
+            WORLD_SIZE
+        );
+
+    }
+
+
+    scene.add(
+        npc
+    );
+
+    npcs.push(
+        npc
+    );
+
+}
+
+
+/* INITIAL NPCS */
+
+for(
+    let i=0;
+    i<60;
+    i++
+){
+
+    spawnNPC();
+
+}
+
+
+/* =====================================================
+   LOADING
+===================================================== */
+
+let loadingProgress=0;
+
+
+const loadingInterval=
+    setInterval(
+        ()=>{
+
+            loadingProgress+=7+
+                Math.random()*10;
+
+
+            if(
+                loadingProgress>=100
+            ){
+
+                loadingProgress=100;
+
+                clearInterval(
+                    loadingInterval
+                );
+
+
+                setTimeout(
+                    ()=>{
+
+                        document
+                            .getElementById(
+                                "loading"
+                            )
+                            .style.display=
+                            "none";
+
+
+                        document
+                            .getElementById(
+                                "startScreen"
+                            )
+                            .style.display=
+                            "flex";
+
+                    },
+                    400
+                );
+
+            }
+
+
+            document
+                .getElementById(
+                    "loadingProgress"
+                )
+                .style.width=
+                loadingProgress+
+                "%";
+
+        },
+        120
+    );
+
+
+/* =====================================================
+   RESIZE
+===================================================== */
+
+window.addEventListener(
+    "resize",
+    ()=>{
+
+        camera.aspect=
+            innerWidth/
+            innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            innerWidth,
+            innerHeight
+        );
+
+    }
+);
+/* =====================================================
+   PART 2/3
+   TRAFFIC + NPC AI + SHOPS + SERVICES + POLICE
+===================================================== */
+
+
+/* =====================================================
+   NPC AI
+===================================================== */
+
+function updateNPCs(dt){
+
+    for(const npc of npcs){
+
+        npc.userData.walkTime += dt * 7;
+
+        if(npc.userData.panic){
+
+            const target =
+                inCar
+                ? car.position
+                : playerGroup.position;
+
+            const direction =
+                new THREE.Vector3()
+                    .subVectors(
+                        npc.position,
+                        target
+                    );
+
+            direction.y=0;
+
+            if(direction.length()<0.1){
+                direction.set(
+                    Math.random()-.5,
+                    0,
+                    Math.random()-.5
+                );
+            }
+
+            direction.normalize();
+
+            npc.position.addScaledVector(
+                direction,
+                4.8*dt
+            );
+
+            npc.rotation.y=
+                Math.atan2(
+                    direction.x,
+                    direction.z
+                );
+
+            npc.userData.leftLeg.rotation.x=
+                Math.sin(npc.userData.walkTime)*.8;
+
+            npc.userData.rightLeg.rotation.x=
+                -Math.sin(npc.userData.walkTime)*.8;
+
+            npc.userData.leftArm.rotation.x=
+                -Math.sin(npc.userData.walkTime)*.5;
+
+            npc.userData.rightArm.rotation.x=
+                Math.sin(npc.userData.walkTime)*.5;
+
+            continue;
+        }
+
+
+        npc.userData.changeDirection-=dt;
+
+
+        if(
+            npc.userData.changeDirection<=0
+        ){
+
+            npc.userData.direction=
+                Math.random()*
+                Math.PI*2;
+
+            npc.userData.changeDirection=
+                3+
+                Math.random()*5;
+
+        }
+
+
+        const direction=
+            new THREE.Vector3(
+                Math.sin(
+                    npc.userData.direction
+                ),
+                0,
+                Math.cos(
+                    npc.userData.direction
+                )
+            );
+
+
+        npc.position.addScaledVector(
+            direction,
+            npc.userData.speed*dt
+        );
+
+
+        npc.rotation.y=
+            npc.userData.direction;
+
+
+        const swing=
+            Math.sin(
+                npc.userData.walkTime
+            )*.45;
+
+
+        npc.userData.leftLeg.rotation.x=
+            swing;
+
+        npc.userData.rightLeg.rotation.x=
+            -swing;
+
+        npc.userData.leftArm.rotation.x=
+            -swing*.6;
+
+        npc.userData.rightArm.rotation.x=
+            swing*.6;
+
+
+        const half=
+            WORLD_SIZE/2-10;
+
+
+        if(
+            npc.position.x>half
+        ){
+
+            npc.position.x=half;
+            npc.userData.direction=
+                Math.PI;
+
+        }
+
+
+        if(
+            npc.position.x<-half
+        ){
+
+            npc.position.x=-half;
+            npc.userData.direction=0;
+
+        }
+
+
+        if(
+            npc.position.z>half
+        ){
+
+            npc.position.z=half;
+            npc.userData.direction=
+                -Math.PI/2;
+
+        }
+
+
+        if(
+            npc.position.z<-half
+        ){
+
+            npc.position.z=-half;
+            npc.userData.direction=
+                Math.PI/2;
+
+        }
+
+    }
+
+
+    npcSpawnTimer+=dt;
+
+
+    if(
+        npcSpawnTimer>6 &&
+        npcs.length<90
+    ){
+
+        npcSpawnTimer=0;
+
+        spawnNPC();
+
+    }
+
+}
+
+
+/* =====================================================
+   NPC PANIC
+===================================================== */
+
+function panicNearbyNPCs(){
+
+    const target=
+        inCar
+        ? car.position
+        : playerGroup.position;
+
+
+    for(const npc of npcs){
+
+        if(
+            npc.position.distanceTo(
+                target
+            )<65
+        ){
+
+            npc.userData.panic=true;
+
+            setTimeout(
+                ()=>{
+                    npc.userData.panic=false;
+                },
+                6500
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   TRAFFIC AI
+===================================================== */
+
+function updateTraffic(dt){
+
+    for(const traffic of trafficCars){
+
+        const forward=
+            new THREE.Vector3(
+                0,
+                0,
+                -1
+            ).applyQuaternion(
+                traffic.quaternion
+            );
+
+
+        traffic.position.addScaledVector(
+            forward,
+            traffic.userData.speed*dt
+        );
+
+
+        for(
+            const wheel of
+            traffic.userData.wheels
+        ){
+
+            wheel.children[0].rotation.x+=
+                traffic.userData.speed*
+                dt*
+                1.8;
+
+        }
+
+
+        const limit=
+            WORLD_SIZE/2+35;
+
+
+        if(
+            traffic.position.x>limit
+        ){
+            traffic.position.x=-limit;
+        }
+
+
+        if(
+            traffic.position.x<-limit
+        ){
+            traffic.position.x=limit;
+        }
+
+
+        if(
+            traffic.position.z>limit
+        ){
+            traffic.position.z=-limit;
+        }
+
+
+        if(
+            traffic.position.z<-limit
+        ){
+            traffic.position.z=limit;
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   TRAFFIC COLLISIONS
+===================================================== */
+
+function checkTrafficCollision(){
+
+    if(!inCar)return;
+
+
+    for(
+        const traffic of
+        trafficCars
+    ){
+
+        const distance=
+            car.position.distanceTo(
+                traffic.position
+            );
+
+
+        if(
+            distance<5
+        ){
+
+            carSpeed*=-.35;
+
+            playerHealth-=5;
+
+            updateHealthUI();
+
+            addCameraShake(
+                .25
+            );
+
+            showMessage(
+                "Vehicle collision"
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   SHOPS
+===================================================== */
+
+function createShop(
+    name,
+    x,
+    z,
+    color
+){
+
+    const group=
+        new THREE.Group();
+
+
+    const building=
+        createBox(
+            26,
+            11,
+            20,
+            0x343f49
+        );
+
+    building.position.y=5.5;
+
+    group.add(
+        building
+    );
+
+
+    const front=
+        createBox(
+            23,
+            7,
+            .4,
+            color
+        );
+
+    front.position.set(
+        0,
+        4,
+        -10.2
+    );
+
+    group.add(
+        front
+    );
+
+
+    const door=
+        createBox(
+            3,
+            5,
+            .5,
             0x151515
         );
 
+    door.position.set(
+        0,
+        2.5,
+        -10.45
+    );
 
-    /* BLUE LIGHT */
+    group.add(
+        door
+    );
 
-    const blue =
-        new THREE.Mesh(
 
-            new THREE.BoxGeometry(
-                .5,
-                .25,
-                1
-            ),
+    const windows=[
+        -7,
+        7
+    ];
 
-            new THREE.MeshBasicMaterial({
-                color:0x0066ff
-            })
 
+    for(
+        const xPos of windows
+    ){
+
+        const window=
+            createBox(
+                5,
+                3.5,
+                .3,
+                0x77b3c8
+            );
+
+        window.position.set(
+            xPos,
+            4.2,
+            -10.35
+        );
+
+        group.add(
+            window
+        );
+
+    }
+
+
+    group.position.set(
+        x,
+        0,
+        z
+    );
+
+
+    group.userData.name=name;
+
+    group.userData.radius=18;
+
+
+    scene.add(
+        group
+    );
+
+
+    shops.push(
+        group
+    );
+
+
+    const sign=
+        createTextSprite(
+            name
         );
 
 
-    blue.position.set(
-        -.35,
-        2.75,
-        .4
+    sign.position.set(
+        x,
+        12.5,
+        z-10.8
     );
 
 
-    police.add(
-        blue
+    sign.scale.set(
+        17,
+        4,
+        1
     );
 
 
-    /* RED LIGHT */
+    scene.add(
+        sign
+    );
 
-    const red =
+}
+
+
+/* =====================================================
+   BUSINESSES
+===================================================== */
+
+createShop(
+    "24/7 MARKET",
+    -105,
+    45,
+    0x247b43
+);
+
+
+createShop(
+    "CAR DEALERSHIP",
+    105,
+    45,
+    0x2467a8
+);
+
+
+createShop(
+    "CLOTHING STORE",
+    -105,
+    -45,
+    0x8b3d92
+);
+
+
+createShop(
+    "CAFE",
+    105,
+    -45,
+    0xa35f32
+);
+
+
+createShop(
+    "RESTAURANT",
+    -195,
+    135,
+    0x9b3838
+);
+
+
+createShop(
+    "HOTEL",
+    195,
+    135,
+    0x536f9a
+);
+
+
+createShop(
+    "BANK",
+    195,
+    225,
+    0x59645f
+);
+
+
+createShop(
+    "HOSPITAL",
+    -195,
+    225,
+    0x7193a7
+);
+
+
+/* =====================================================
+   GARAGE
+===================================================== */
+
+createShop(
+    "GARAGE",
+    -195,
+    -135,
+    0x555d63
+);
+
+
+/* =====================================================
+   GAS STATION
+===================================================== */
+
+function createGasStation(
+    x,
+    z
+){
+
+    const group=
+        new THREE.Group();
+
+
+    const canopy=
+        createBox(
+            42,
+            1.2,
+            25,
+            0xe7e7e7
+        );
+
+    canopy.position.y=8;
+
+    group.add(
+        canopy
+    );
+
+
+    for(
+        const dx of [-17,17]
+    ){
+
+        const column=
+            createBox(
+                1,
+                8,
+                1,
+                0x555555
+            );
+
+        column.position.set(
+            dx,
+            4,
+            -9
+        );
+
+        group.add(
+            column
+        );
+
+    }
+
+
+    for(
+        let i=-12;
+        i<=12;
+        i+=12
+    ){
+
+        const pump=
+            createBox(
+                2.5,
+                3,
+                1.5,
+                0xd5d5d5
+            );
+
+        pump.position.set(
+            i,
+            1.5,
+            4
+        );
+
+        group.add(
+            pump
+        );
+
+    }
+
+
+    group.position.set(
+        x,
+        0,
+        z
+    );
+
+
+    scene.add(
+        group
+    );
+
+
+    const sign=
+        createTextSprite(
+            "GAS STATION"
+        );
+
+    sign.position.set(
+        x,
+        14,
+        z
+    );
+
+    sign.scale.set(
+        23,
+        5,
+        1
+    );
+
+    scene.add(
+        sign
+    );
+
+}
+
+
+createGasStation(
+    315,
+    -315
+);
+
+
+/* =====================================================
+   POLICE STATION
+===================================================== */
+
+createShop(
+    "POLICE STATION",
+    315,
+    -135,
+    0x42515e
+);
+
+
+/* =====================================================
+   TRAFFIC LIGHTS
+===================================================== */
+
+function createTrafficLight(
+    x,
+    z,
+    rotation=0
+){
+
+    const group=
+        new THREE.Group();
+
+
+    const pole=
         new THREE.Mesh(
-
-            new THREE.BoxGeometry(
-                .5,
-                .25,
-                1
+            new THREE.CylinderGeometry(
+                .14,
+                .14,
+                7,
+                8
             ),
+            material(0x222222)
+        );
 
-            new THREE.MeshBasicMaterial({
-                color:0xff1111
+
+    pole.position.y=3.5;
+
+    group.add(
+        pole
+    );
+
+
+    const housing=
+        createBox(
+            .9,
+            2.8,
+            .7,
+            0x111111
+        );
+
+    housing.position.y=6;
+
+    group.add(
+        housing
+    );
+
+
+    const red=
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .22,
+                12,
+                12
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0xff2020,
+                emissive:0xff0000,
+                emissiveIntensity:1
             })
-
         );
 
 
     red.position.set(
-        .35,
-        2.75,
-        .4
+        0,
+        6.65,
+        -.38
     );
 
-
-    police.add(
+    group.add(
         red
     );
 
 
-    police.userData.blue =
-        blue;
+    const yellow=
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .22,
+                12,
+                12
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0xffb900,
+                emissive:0xff8c00,
+                emissiveIntensity:.5
+            })
+        );
 
 
-    police.userData.red =
-        red;
+    yellow.position.set(
+        0,
+        6,
+        -.38
+    );
+
+    group.add(
+        yellow
+    );
 
 
-    police.userData.speed =
+    const green=
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .22,
+                12,
+                12
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0x28b54b,
+                emissive:0x008f22,
+                emissiveIntensity:.3
+            })
+        );
+
+
+    green.position.set(
+        0,
+        5.35,
+        -.38
+    );
+
+    group.add(
+        green
+    );
+
+
+    group.position.set(
+        x,
+        0,
+        z
+    );
+
+
+    group.rotation.y=
+        rotation;
+
+
+    group.userData={
+        red:red,
+        yellow:yellow,
+        green:green,
+        timer:Math.random()*12
+    };
+
+
+    scene.add(
+        group
+    );
+
+
+    trafficLights.push(
+        group
+    );
+
+}
+
+
+/* =====================================================
+   TRAFFIC LIGHT LOCATIONS
+===================================================== */
+
+for(
+    const x of [-180,0,180]
+){
+
+    for(
+        const z of [-180,0,180]
+    ){
+
+        createTrafficLight(
+            x+ROAD_SIZE/2+5,
+            z+ROAD_SIZE/2+5,
+            0
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   TRAFFIC LIGHT SYSTEM
+===================================================== */
+
+function updateTrafficLights(dt){
+
+    for(
+        const light of
+        trafficLights
+    ){
+
+        light.userData.timer+=dt;
+
+
+        const cycle=
+            light.userData.timer%12;
+
+
+        if(
+            cycle<6
+        ){
+
+            light.userData.red
+                .material
+                .emissiveIntensity=3;
+
+            light.userData.yellow
+                .material
+                .emissiveIntensity=.1;
+
+            light.userData.green
+                .material
+                .emissiveIntensity=.1;
+
+        }
+        else if(
+            cycle<8
+        ){
+
+            light.userData.red
+                .material
+                .emissiveIntensity=.1;
+
+            light.userData.yellow
+                .material
+                .emissiveIntensity=3;
+
+            light.userData.green
+                .material
+                .emissiveIntensity=.1;
+
+        }
+        else{
+
+            light.userData.red
+                .material
+                .emissiveIntensity=.1;
+
+            light.userData.yellow
+                .material
+                .emissiveIntensity=.1;
+
+            light.userData.green
+                .material
+                .emissiveIntensity=3;
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   POLICE CARS
+===================================================== */
+
+function createPoliceCar(){
+
+    const police=
+        createCar(
+            0xe5e5e5,
+            true
+        );
+
+
+    police.userData.speed=
         12;
-
-
-    police.userData.police =
-        true;
 
 
     return police;
@@ -2446,17 +3305,13 @@ function createPoliceCar(){
 }
 
 
-/* ==========================================
-   SPAWN POLICE
-========================================== */
-
-function spawnPolice(
+function spawnPoliceCar(
     x,
     z,
     rotation
 ){
 
-    const police =
+    const police=
         createPoliceCar();
 
 
@@ -2467,7 +3322,7 @@ function spawnPolice(
     );
 
 
-    police.rotation.y =
+    police.rotation.y=
         rotation;
 
 
@@ -2483,818 +3338,614 @@ function spawnPolice(
 }
 
 
-/* ==========================================
-   INITIAL POLICE
-========================================== */
-
-spawnPolice(
-    -160,
+spawnPoliceCar(
+    -180,
     80,
     0
 );
 
-spawnPolice(
-    160,
+
+spawnPoliceCar(
+    180,
     -80,
     Math.PI
 );
 
 
-/* ==========================================
-   INPUT
-========================================== */
+/* =====================================================
+   POLICE AI
+===================================================== */
+
+function updatePolice(dt){
+
+    for(
+        const police of
+        policeCars
+    ){
+
+        if(
+            wantedLevel<=0
+        ){
+
+            continue;
+
+        }
+
+
+        const target=
+            inCar
+            ? car.position
+            : playerGroup.position;
+
+
+        const direction=
+            new THREE.Vector3()
+                .subVectors(
+                    target,
+                    police.position
+                );
+
+
+        direction.y=0;
+
+
+        if(
+            direction.length()>2
+        ){
+
+            direction.normalize();
+
+
+            const desiredAngle=
+                Math.atan2(
+                    direction.x,
+                    direction.z
+                );
+
+
+            let difference=
+                desiredAngle-
+                police.rotation.y;
+
+
+            while(
+                difference>Math.PI
+            ){
+                difference-=Math.PI*2;
+            }
+
+
+            while(
+                difference<-Math.PI
+            ){
+                difference+=Math.PI*2;
+            }
+
+
+            police.rotation.y+=
+                THREE.MathUtils.clamp(
+                    difference,
+                    -dt*3,
+                    dt*3
+                );
+
+
+            police.position.addScaledVector(
+                direction,
+                (
+                    police.userData.speed+
+                    wantedLevel*2
+                )*dt
+            );
+
+        }
+
+
+        if(
+            police.position.distanceTo(
+                target
+            )<7
+        ){
+
+            playerHealth-=
+                12*dt;
+
+            updateHealthUI();
+
+            addCameraShake(
+                .08
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   SHOP INTERACTION
+===================================================== */
+
+function updateShops(){
+
+    const target=
+        inCar
+        ? car.position
+        : playerGroup.position;
+
+
+    for(
+        const shop of
+        shops
+    ){
+
+        if(
+            target.distanceTo(
+                shop.position
+            )<
+            shop.userData.radius
+        ){
+
+            showMessage(
+                shop.userData.name+
+                " — Press E"
+            );
+
+            return;
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   SHOP ACTION
+===================================================== */
+
+function interactWithShop(){
+
+    const target=
+        inCar
+        ? car.position
+        : playerGroup.position;
+
+
+    for(
+        const shop of
+        shops
+    ){
+
+        if(
+            target.distanceTo(
+                shop.position
+            )>
+            shop.userData.radius
+        ){
+
+            continue;
+
+        }
+
+
+        const name=
+            shop.userData.name;
+
+
+        if(
+            name==="24/7 MARKET"
+        ){
+
+            if(
+                money>=50
+            ){
+
+                money-=50;
+
+                playerHealth=
+                    Math.min(
+                        100,
+                        playerHealth+35
+                    );
+
+                updateHealthUI();
+
+                showMessage(
+                    "Health Pack purchased"
+                );
+
+            }
+            else{
+
+                showMessage(
+                    "Not enough money"
+                );
+
+            }
+
+        }
+
+
+        else if(
+            name==="CAR DEALERSHIP"
+        ){
+
+            showMessage(
+                "Car Dealership — New vehicles coming soon"
+            );
+
+        }
+
+
+        else if(
+            name==="CLOTHING STORE"
+        ){
+
+            if(
+                money>=150
+            ){
+
+                money-=150;
+
+                showMessage(
+                    "New outfit purchased"
+                );
+
+            }
+            else{
+
+                showMessage(
+                    "Not enough money"
+                );
+
+            }
+
+        }
+
+
+        else if(
+            name==="CAFE"
+        ){
+
+            if(
+                money>=25
+            ){
+
+                money-=25;
+
+                playerHealth=
+                    Math.min(
+                        100,
+                        playerHealth+15
+                    );
+
+                updateHealthUI();
+
+                showMessage(
+                    "Coffee purchased"
+                );
+
+            }
+            else{
+
+                showMessage(
+                    "Not enough money"
+                );
+
+            }
+
+        }
+
+
+        else if(
+            name==="RESTAURANT"
+        ){
+
+            if(
+                money>=50
+            ){
+
+                money-=50;
+
+                playerHealth=
+                    Math.min(
+                        100,
+                        playerHealth+30
+                    );
+
+                updateHealthUI();
+
+                showMessage(
+                    "Meal purchased"
+                );
+
+            }
+            else{
+
+                showMessage(
+                    "Not enough money"
+                );
+
+            }
+
+        }
+
+
+        else if(
+            name==="GARAGE"
+        ){
+
+            carSpeed=0;
+
+            showMessage(
+                "Vehicle repaired"
+            );
+
+        }
+
+
+        else if(
+            name==="BANK"
+        ){
+
+            money+=100;
+
+            updateMoneyUI();
+
+            showMessage(
+                "Bank bonus +$100"
+            );
+
+        }
+
+
+        else if(
+            name==="HOSPITAL"
+        ){
+
+            playerHealth=100;
+
+            updateHealthUI();
+
+            showMessage(
+                "Health restored"
+            );
+
+        }
+
+
+        else if(
+            name==="HOTEL"
+        ){
+
+            showMessage(
+                "Hotel — Rest complete"
+            );
+
+        }
+
+
+        else if(
+            name==="POLICE STATION"
+        ){
+
+            wantedLevel=0;
+
+            wantedTimer=0;
+
+            updateWantedUI();
+
+            showMessage(
+                "Wanted level cleared"
+            );
+
+        }
+
+
+        return;
+
+    }
+
+}
+
+
+/* =====================================================
+   E KEY
+===================================================== */
 
 window.addEventListener(
     "keydown",
-    event => {
-
-        keys[
-            event.code
-        ] = true;
-
-    }
-);
-
-
-window.addEventListener(
-    "keyup",
-    event => {
-
-        keys[
-            event.code
-        ] = false;
-
-    }
-);
-
-
-/* ==========================================
-   START BUTTON
-========================================== */
-
-document
-    .getElementById(
-        "startButton"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            gameStarted =
-                true;
-
-
-            document
-                .getElementById(
-                    "startScreen"
-                )
-                .style.display =
-                "none";
-
-
-            document
-                .getElementById(
-                    "crosshair"
-                )
-                .style.display =
-                "block";
-
-
-            document
-                .getElementById(
-                    "vehicleHud"
-                )
-                .style.display =
-                "none";
-
-
-            renderer.domElement
-                .requestPointerLock();
-
-        }
-    );
-
-
-/* ==========================================
-   POINTER LOCK
-========================================== */
-
-document.addEventListener(
-    "pointerlockchange",
-    () => {
-
-        pointerLocked =
-            document.pointerLockElement ===
-            renderer.domElement;
-
-    }
-);
-
-
-document.addEventListener(
-    "mousemove",
-    event => {
+    event=>{
 
         if(
-            !pointerLocked ||
-            !gameStarted
+            event.code==="KeyE" &&
+            gameStarted
         ){
-            return;
+
+            interactWithShop();
+
         }
-
-
-        yaw -=
-            event.movementX *
-            .0025;
-
-
-        pitch -=
-            event.movementY *
-            .002;
-
-
-        pitch =
-            THREE.MathUtils.clamp(
-                pitch,
-                -1.1,
-                .7
-            );
 
     }
 );
+/* =====================================================
+   STAGE 8 — PART 3/3
+   MISSIONS + MONEY + WANTED + MINIMAP + DAY/NIGHT
+===================================================== */
 
 
-/* ==========================================
-   PLAYER MOVEMENT
-========================================== */
+/* =====================================================
+   MISSION SYSTEM
+===================================================== */
 
-function updatePlayer(
-    dt
-){
+let missions = [
 
-    if(
-        inCar ||
-        !gameStarted
-    ){
-        return;
-    }
-
-
-    let forward = 0;
-    let side = 0;
-
-
-    if(
-        keys["KeyW"] ||
-        keys["ArrowUp"]
-    ){
-
-        forward += 1;
-
-    }
-
-
-    if(
-        keys["KeyS"] ||
-        keys["ArrowDown"]
-    ){
-
-        forward -= 1;
-
-    }
-
-
-    if(
-        keys["KeyA"] ||
-        keys["ArrowLeft"]
-    ){
-
-        side -= 1;
-
-    }
-
-
-    if(
-        keys["KeyD"] ||
-        keys["ArrowRight"]
-    ){
-
-        side += 1;
-
-    }
-
-
-    if(
-        forward === 0 &&
-        side === 0
-    ){
-
-        return;
-
-    }
-
-
-    const direction =
-        new THREE.Vector3(
-            side,
+    {
+        name:"CITY DELIVERY",
+        reward:500,
+        target:new THREE.Vector3(
+            180,
             0,
-            -forward
-        );
-
-
-    direction.normalize();
-
-
-    direction.applyAxisAngle(
-        new THREE.Vector3(
-            0,
-            1,
-            0
+            180
         ),
-        yaw
-    );
-
-
-    const speed =
-        keys["ShiftLeft"] ||
-        keys["ShiftRight"]
-        ? 15
-        : 8;
-
-
-    playerGroup.position.add(
-        direction.multiplyScalar(
-            speed * dt
-        )
-    );
-
-
-    player.rotation.y =
-        Math.atan2(
-            direction.x,
-            direction.z
-        );
-
-
-    /* walking animation */
-
-    playerGroup.userData.walkTime +=
-        dt *
-        9;
-
-
-    const swing =
-        Math.sin(
-            playerGroup.userData.walkTime
-        ) *
-        .65;
-
-
-    playerGroup.userData.leftLeg
-        .rotation.x =
-        swing;
-
-
-    playerGroup.userData.rightLeg
-        .rotation.x =
-        -swing;
-
-
-    playerGroup.userData.leftArm
-        .rotation.x =
-        -swing*.65;
-
-
-    playerGroup.userData.rightArm
-        .rotation.x =
-        swing*.65;
-
-
-    /* map bounds */
-
-    const limit =
-        WORLD_SIZE/2 -
-        8;
-
-
-    playerGroup.position.x =
-        THREE.MathUtils.clamp(
-            playerGroup.position.x,
-            -limit,
-            limit
-        );
-
-
-    playerGroup.position.z =
-        THREE.MathUtils.clamp(
-            playerGroup.position.z,
-            -limit,
-            limit
-        );
-
-}
-
-
-/* ==========================================
-   CAR MOVEMENT
-========================================== */
-
-function updatePlayerCar(
-    dt
-){
-
-    if(
-        !inCar ||
-        !gameStarted
-    ){
-        return;
-    }
-
-
-    const acceleration =
-        27;
-
-
-    const brake =
-        34;
-
-
-    const maxSpeed =
-        55;
-
-
-    if(
-        keys["KeyW"] ||
-        keys["ArrowUp"]
-    ){
-
-        carSpeed +=
-            acceleration *
-            dt;
-
-    }
-
-
-    if(
-        keys["KeyS"] ||
-        keys["ArrowDown"]
-    ){
-
-        carSpeed -=
-            brake *
-            dt;
-
-    }
-
-
-    if(
-        !keys["KeyW"] &&
-        !keys["ArrowUp"] &&
-        !keys["KeyS"] &&
-        !keys["ArrowDown"]
-    ){
-
-        carSpeed *=
-            Math.pow(
-                .975,
-                dt*60
-            );
-
-    }
-
-
-    carSpeed =
-        THREE.MathUtils.clamp(
-            carSpeed,
-            -18,
-            maxSpeed
-        );
-
-
-    let steering = 0;
-
-
-    if(
-        keys["KeyA"] ||
-        keys["ArrowLeft"]
-    ){
-
-        steering += 1;
-
-    }
-
-
-    if(
-        keys["KeyD"] ||
-        keys["ArrowRight"]
-    ){
-
-        steering -= 1;
-
-    }
-
-
-    const steeringStrength =
-        Math.min(
-            Math.abs(carSpeed)/10,
-            1
-        );
-
-
-    car.rotation.y +=
-        steering *
-        1.5 *
-        steeringStrength *
-        dt *
-        (
-            carSpeed >= 0
-            ? 1
-            : -1
-        );
-
-
-    const direction =
-        new THREE.Vector3(
+        description:"Drive to the marked location."
+    },
+
+    {
+        name:"DOWNTOWN JOB",
+        reward:750,
+        target:new THREE.Vector3(
+            -180,
             0,
+            180
+        ),
+        description:"Reach Downtown."
+    },
+
+    {
+        name:"NIGHT RUN",
+        reward:1000,
+        target:new THREE.Vector3(
+            -180,
             0,
-            -1
-        );
+            -180
+        ),
+        description:"Complete the night run."
+    },
 
-
-    direction.applyQuaternion(
-        car.quaternion
-    );
-
-
-    car.position.add(
-        direction.multiplyScalar(
-            carSpeed *
-            dt
-        )
-    );
-
-
-    const limit =
-        WORLD_SIZE/2 -
-        10;
-
-
-    car.position.x =
-        THREE.MathUtils.clamp(
-            car.position.x,
-            -limit,
-            limit
-        );
-
-
-    car.position.z =
-        THREE.MathUtils.clamp(
-            car.position.z,
-            -limit,
-            limit
-        );
-
-
-    playerGroup.position.copy(
-        car.position
-    );
-
-
-    if(
-        car.userData.wheels
-    ){
-
-        car.userData.wheels
-            .forEach(
-                wheel => {
-
-                    wheel.children[0]
-                        .rotation.x +=
-                        carSpeed *
-                        dt *
-                        1.8;
-
-                }
-            );
-
-    }
-
-
-    updateSpeedUI();
-
-}
-
-
-/* ==========================================
-   ENTER / EXIT CAR
-========================================== */
-
-window.addEventListener(
-    "keydown",
-    event => {
-
-        if(
-            event.code !==
-            "KeyE"
-        ){
-            return;
-        }
-
-
-        if(
-            !gameStarted
-        ){
-            return;
-        }
-
-
-        if(
-            inCar
-        ){
-
-            exitCar();
-
-        }
-        else{
-
-            enterCar();
-
-        }
-
-    }
-);
-
-
-function enterCar(){
-
-    const distance =
-        playerGroup.position.distanceTo(
-            car.position
-        );
-
-
-    if(
-        distance > 9
-    ){
-
-        showMessage(
-            "Get closer to your car"
-        );
-
-        return;
-
-    }
-
-
-    inCar =
-        true;
-
-
-    player.visible =
-        false;
-
-
-    document
-        .getElementById(
-            "speedometer"
-        )
-        .style.display =
-        "block";
-
-
-    document
-        .getElementById(
-            "vehicleHud"
-        )
-        .style.display =
-        "block";
-
-
-    showMessage(
-        "W/S drive • A/D steer • E exit"
-    );
-
-}
-
-
-function exitCar(){
-
-    inCar =
-        false;
-
-
-    player.visible =
-        true;
-
-
-    const side =
-        new THREE.Vector3(
-            Math.cos(
-                car.rotation.y
-            ),
+    {
+        name:"CITY ESCAPE",
+        reward:1500,
+        target:new THREE.Vector3(
+            180,
             0,
-            -Math.sin(
-                car.rotation.y
-            )
-        );
-
-
-    playerGroup.position.copy(
-        car.position
-    );
-
-
-    playerGroup.position.add(
-        side.multiplyScalar(
-            5
-        )
-    );
-
-
-    carSpeed =
-        0;
-
-
-    document
-        .getElementById(
-            "speedometer"
-        )
-        .style.display =
-        "none";
-
-
-    document
-        .getElementById(
-            "vehicleHud"
-        )
-        .style.display =
-        "none";
-
-}
-
-
-/* ==========================================
-   SHOOTING
-========================================== */
-
-window.addEventListener(
-    "mousedown",
-    event => {
-
-        if(
-            event.button !== 0 ||
-            !gameStarted ||
-            inCar
-        ){
-            return;
-        }
-
-
-        shoot();
-
+            -180
+        ),
+        description:"Reach the safe zone."
     }
-);
+
+];
 
 
-function shoot(){
+let currentMissionIndex=0;
+
+let missionActive=false;
+
+let missionMarker=null;
+
+
+/* =====================================================
+   CREATE MISSION MARKER
+===================================================== */
+
+function createMissionMarker(){
 
     if(
-        ammo <= 0
+        missionMarker
     ){
 
-        showMessage(
-            "Press R to reload"
+        scene.remove(
+            missionMarker
         );
-
-        return;
 
     }
 
 
-    ammo--;
-
-    updateAmmoUI();
-
-
-    increaseWanted(
-        1
-    );
+    const group=
+        new THREE.Group();
 
 
-    panicNearbyNPCs();
-
-
-    addCameraShake(
-        .12
-    );
-
-
-    const flash =
+    const ring=
         new THREE.Mesh(
 
-            new THREE.SphereGeometry(
-                .12,
-                8,
-                8
+            new THREE.TorusGeometry(
+                7,
+                .7,
+                12,
+                40
             ),
 
-            new THREE.MeshBasicMaterial({
-                color:0xffff99
+            new THREE.MeshStandardMaterial({
+                color:0xffc400,
+                emissive:0xff9900,
+                emissiveIntensity:1
             })
 
         );
 
 
-    flash.position.copy(
-        camera.position
+    ring.rotation.x=
+        Math.PI/2;
+
+
+    group.add(
+        ring
     );
 
 
-    const direction =
-        new THREE.Vector3(
-            0,
-            0,
-            -1
+    const beam=
+        new THREE.Mesh(
+
+            new THREE.CylinderGeometry(
+                2,
+                7,
+                18,
+                24,
+                1,
+                true
+            ),
+
+            new THREE.MeshBasicMaterial({
+                color:0xffc400,
+                transparent:true,
+                opacity:.18,
+                side:THREE.DoubleSide
+            })
+
         );
 
 
-    direction.applyAxisAngle(
-        new THREE.Vector3(
-            1,
-            0,
-            0
-        ),
-        pitch
+    beam.position.y=
+        9;
+
+
+    group.add(
+        beam
     );
 
 
-    direction.applyAxisAngle(
-        new THREE.Vector3(
-            0,
-            1,
-            0
-        ),
-        yaw
+    const mission=
+        missions[
+            currentMissionIndex
+        ];
+
+
+    group.position.copy(
+        mission.target
     );
 
 
-    flash.position.add(
-        direction.multiplyScalar(
-            1.5
-        )
-    );
+    missionMarker=
+        group;
 
 
     scene.add(
-        flash
-    );
-
-
-    setTimeout(
-        () => {
-
-            scene.remove(
-                flash
-            );
-
-        },
-        70
+        group
     );
 
 }
 
 
-/* ==========================================
-   RELOAD
-========================================== */
+/* =====================================================
+   START MISSION
+===================================================== */
 
-window.addEventListener(
-    "keydown",
-    event => {
-
-        if(
-            event.code ===
-            "KeyR"
-        ){
-
-            reload();
-
-        }
-
-    }
-);
-
-
-function reload(){
-
-    const missing =
-        12 -
-        ammo;
-
+function startMission(){
 
     if(
-        missing <= 0 ||
-        reserveAmmo <= 0
+        missionActive
     ){
 
         return;
@@ -3302,77 +3953,311 @@ function reload(){
     }
 
 
-    const amount =
+    missionActive=true;
+
+
+    createMissionMarker();
+
+
+    const mission=
+        missions[
+            currentMissionIndex
+        ];
+
+
+    showMessage(
+        mission.name+
+        " — "+
+        mission.description
+    );
+
+}
+
+
+/* =====================================================
+   UPDATE MISSION
+===================================================== */
+
+function updateMission(){
+
+    if(
+        !missionActive ||
+        !missionMarker
+    ){
+
+        return;
+
+    }
+
+
+    missionMarker.rotation.y+=
+        .025;
+
+
+    const target=
+        inCar
+        ? car.position
+        : playerGroup.position;
+
+
+    const distance=
+        target.distanceTo(
+            missionMarker.position
+        );
+
+
+    const distanceElement=
+        document.getElementById(
+            "missionDistance"
+        );
+
+
+    if(
+        distanceElement
+    ){
+
+        distanceElement.textContent=
+            Math.round(distance)+
+            "m";
+
+    }
+
+
+    if(
+        distance<12
+    ){
+
+        completeMission();
+
+    }
+
+}
+
+
+/* =====================================================
+   COMPLETE MISSION
+===================================================== */
+
+function completeMission(){
+
+    const mission=
+        missions[
+            currentMissionIndex
+        ];
+
+
+    money+=
+        mission.reward;
+
+
+    updateMoneyUI();
+
+
+    showMessage(
+        "MISSION COMPLETE  +$"+
+        mission.reward
+    );
+
+
+    missionActive=false;
+
+
+    if(
+        missionMarker
+    ){
+
+        scene.remove(
+            missionMarker
+        );
+
+        missionMarker=null;
+
+    }
+
+
+    currentMissionIndex++;
+
+
+    if(
+        currentMissionIndex>=
+        missions.length
+    ){
+
+        currentMissionIndex=0;
+
+    }
+
+
+    setTimeout(
+        ()=>{
+            startMission();
+        },
+        3500
+    );
+
+}
+
+
+/* =====================================================
+   MISSION KEY
+===================================================== */
+
+window.addEventListener(
+    "keydown",
+    event=>{
+
+        if(
+            event.code==="KeyM" &&
+            gameStarted
+        ){
+
+            if(
+                !missionActive
+            ){
+
+                startMission();
+
+            }
+            else{
+
+                showMessage(
+                    "Mission already active"
+                );
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   MONEY UI
+===================================================== */
+
+function updateMoneyUI(){
+
+    const element=
+        document.getElementById(
+            "money"
+        );
+
+
+    if(
+        element
+    ){
+
+        element.textContent=
+            "$"+
+            Math.max(
+                0,
+                Math.floor(money)
+            ).toLocaleString();
+
+    }
+
+}
+
+
+/* =====================================================
+   WANTED SYSTEM
+===================================================== */
+
+let wantedLevel=
+    typeof wantedLevel==="number"
+    ? wantedLevel
+    : 0;
+
+
+let wantedTimer=0;
+
+
+function increaseWanted(
+    amount=1
+){
+
+    wantedLevel=
         Math.min(
-            missing,
-            reserveAmmo
+            5,
+            wantedLevel+amount
         );
 
 
-    ammo +=
-        amount;
+    wantedTimer=0;
 
 
-    reserveAmmo -=
-        amount;
+    updateWantedUI();
 
 
-    updateAmmoUI();
+    panicNearbyNPCs();
 
 }
 
 
-/* ==========================================
-   UI FUNCTIONS
-========================================== */
+/* =====================================================
+   WANTED UPDATE
+===================================================== */
 
-function updateHealthUI(){
+function updateWanted(
+    dt
+){
 
-    document
-        .getElementById(
-            "healthBar"
-        )
-        .style.width =
-        playerHealth +
-        "%";
+    if(
+        wantedLevel<=0
+    ){
 
-}
+        return;
 
-
-function updateAmmoUI(){
-
-    document
-        .getElementById(
-            "ammo"
-        )
-        .textContent =
-        ammo +
-        " / " +
-        reserveAmmo;
-
-}
+    }
 
 
-function updateSpeedUI(){
+    wantedTimer+=dt;
 
-    document
-        .getElementById(
-            "speed"
-        )
-        .textContent =
-        Math.round(
-            Math.abs(
-                carSpeed
-            ) *
-            2.2
-        );
+
+    if(
+        wantedTimer>25
+    ){
+
+        wantedTimer=0;
+
+        wantedLevel=
+            Math.max(
+                0,
+                wantedLevel-1
+            );
+
+
+        updateWantedUI();
+
+    }
 
 }
 
+
+/* =====================================================
+   WANTED UI
+===================================================== */
 
 function updateWantedUI(){
 
-    let stars = "";
+    const element=
+        document.getElementById(
+            "wanted"
+        );
+
+
+    if(
+        !element
+    ){
+
+        return;
+
+    }
+
+
+    let stars="";
+
 
     for(
         let i=0;
@@ -3380,1239 +4265,208 @@ function updateWantedUI(){
         i++
     ){
 
-        stars +=
-            i < wantedLevel
+        stars+=
+            i<wantedLevel
             ? "★"
             : "☆";
 
     }
 
 
-    document
-        .getElementById(
-            "wanted"
-        )
-        .textContent =
+    element.textContent=
         stars;
 
 }
 
 
-function showMessage(
-    text
-){
-
-    const element =
-        document.getElementById(
-            "message"
-        );
-
-
-    element.textContent =
-        text;
-
-
-    element.style.display =
-        "block";
-
-
-    clearTimeout(
-        messageTimeout
-    );
-
-
-    messageTimeout =
-        setTimeout(
-            () => {
-
-                element.style.display =
-                    "none";
-
-            },
-            2500
-        );
-
-}
-
-
-/* ==========================================
-   WANTED SYSTEM
-========================================== */
-
-function increaseWanted(
-    amount=1
-){
-
-    wantedLevel =
-        Math.min(
-            5,
-            wantedLevel +
-            amount
-        );
-
-
-    wantedDecayTimer =
-        0;
-
-
-    updateWantedUI();
-
-}
-
-
-function updateWantedDecay(
-    dt
-){
-
-    if(
-        wantedLevel <= 0
-    ){
-
-        return;
-
-    }
-
-
-    wantedDecayTimer +=
-        dt;
-
-
-    if(
-        wantedDecayTimer > 30
-    ){
-
-        wantedLevel--;
-
-        wantedDecayTimer =
-            0;
-
-        updateWantedUI();
-
-        if(
-            wantedLevel === 0
-        ){
-
-            showMessage(
-                "You lost the police."
-            );
-
-        }
-
-    }
-
-}
-
-
-/* ==========================================
-   POLICE AI
-========================================== */
-
-function updatePolice(
-    dt
-){
-
-    policeCars.forEach(
-        police => {
-
-            const target =
-                inCar
-                ? car.position
-                : playerGroup.position;
-
-
-            const distance =
-                police.position.distanceTo(
-                    target
-                );
-
-
-            if(
-                wantedLevel > 0 &&
-                distance < 220
-            ){
-
-                const direction =
-                    new THREE.Vector3()
-                        .subVectors(
-                            target,
-                            police.position
-                        );
-
-
-                direction.y =
-                    0;
-
-
-                if(
-                    direction.length() >
-                    .5
-                ){
-
-                    direction.normalize();
-
-
-                    const targetAngle =
-                        Math.atan2(
-                            direction.x,
-                            direction.z
-                        );
-
-
-                    let difference =
-                        targetAngle -
-                        police.rotation.y;
-
-
-                    while(
-                        difference >
-                        Math.PI
-                    ){
-
-                        difference -=
-                            Math.PI*2;
-
-                    }
-
-
-                    while(
-                        difference <
-                        -Math.PI
-                    ){
-
-                        difference +=
-                            Math.PI*2;
-
-                    }
-
-
-                    police.rotation.y +=
-                        difference *
-                        Math.min(
-                            dt*3,
-                            1
-                        );
-
-
-                    police.position.add(
-                        direction.multiplyScalar(
-                            (
-                                police.userData.speed +
-                                wantedLevel*2
-                            ) *
-                            dt
-                        )
-                    );
-
-                }
-
-
-                if(
-                    distance < 7
-                ){
-
-                    playerHealth -=
-                        12 *
-                        dt;
-
-
-                    updateHealthUI();
-
-
-                    addCameraShake(
-                        .15
-                    );
-
-
-                    if(
-                        playerHealth <= 0
-                    ){
-
-                        playerHealth =
-                            100;
-
-                        wantedLevel =
-                            0;
-
-                        playerGroup.position.set(
-                            0,
-                            0,
-                            35
-                        );
-
-                        car.position.set(
-                            0,
-                            0,
-                            15
-                        );
-
-                        carSpeed =
-                            0;
-
-                        updateWantedUI();
-                        updateHealthUI();
-
-                        showMessage(
-                            "You escaped."
-                        );
-
-                    }
-
-                }
-
-            }
-
-
-            /* police lights */
-
-            if(
-                police.userData.red &&
-                police.userData.blue
-            ){
-
-                const flash =
-                    Math.floor(
-                        performance.now()/180
-                    ) % 2;
-
-
-                police.userData.red
-                    .visible =
-                    flash === 0;
-
-
-                police.userData.blue
-                    .visible =
-                    flash === 1;
-
-            }
-
-        }
-    );
-
-}
-
-
-/* ==========================================
-   NPC CREATION
-========================================== */
-
-const npcShirtColors = [
-    0x263238,
-    0x8e24aa,
-    0x1565c0,
-    0xd84315,
-    0x2e7d32,
-    0x6d4c41,
-    0xc62828,
-    0x37474f
-];
-
-const npcSkinColors = [
-    0xb87958,
-    0xc98b68,
-    0x8d5524,
-    0xe0a17a
-];
-
-
-function createNPC(){
-
-    const npc =
-        new THREE.Group();
-
-    const skin =
-        new THREE.MeshStandardMaterial({
-            color:
-                npcSkinColors[
-                    Math.floor(
-                        Math.random() *
-                        npcSkinColors.length
-                    )
-                ]
-        });
-
-    const shirt =
-        new THREE.MeshStandardMaterial({
-            color:
-                npcShirtColors[
-                    Math.floor(
-                        Math.random() *
-                        npcShirtColors.length
-                    )
-                ]
-        });
-
-    const pants =
-        new THREE.MeshStandardMaterial({
-            color:0x252525
-        });
-
-
-    /* BODY */
-
-    const body =
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                .72,
-                1.15,
-                .45
-            ),
-            shirt
-        );
-
-    body.position.y =
-        1.85;
-
-    body.castShadow =
-        true;
-
-    npc.add(body);
-
-
-    /* HEAD */
-
-    const head =
-        new THREE.Mesh(
-            new THREE.SphereGeometry(
-                .3,
-                12,
-                12
-            ),
-            skin
-        );
-
-    head.position.y =
-        2.75;
-
-    head.castShadow =
-        true;
-
-    npc.add(head);
-
-
-    /* ARMS */
-
-    const armGeometry =
-        new THREE.CylinderGeometry(
-            .1,
-            .09,
-            1,
-            8
-        );
-
-    const leftArm =
-        new THREE.Mesh(
-            armGeometry,
-            shirt
-        );
-
-    leftArm.position.set(
-        -.47,
-        1.85,
-        0
-    );
-
-    leftArm.rotation.z =
-        -.08;
-
-    npc.add(leftArm);
-
-
-    const rightArm =
-        leftArm.clone();
-
-    rightArm.position.x =
-        .47;
-
-    rightArm.rotation.z =
-        .08;
-
-    npc.add(rightArm);
-
-
-    /* LEGS */
-
-    const legGeometry =
-        new THREE.CylinderGeometry(
-            .12,
-            .11,
-            1.25,
-            8
-        );
-
-    const leftLeg =
-        new THREE.Mesh(
-            legGeometry,
-            pants
-        );
-
-    leftLeg.position.set(
-        -.18,
-        .62,
-        0
-    );
-
-    npc.add(leftLeg);
-
-
-    const rightLeg =
-        leftLeg.clone();
-
-    rightLeg.position.x =
-        .18;
-
-    npc.add(rightLeg);
-
-
-    npc.userData.leftArm =
-        leftArm;
-
-    npc.userData.rightArm =
-        rightArm;
-
-    npc.userData.leftLeg =
-        leftLeg;
-
-    npc.userData.rightLeg =
-        rightLeg;
-
-    npc.userData.walkTime =
-        Math.random() * 10;
-
-    npc.userData.speed =
-        1.2 +
-        Math.random()*1.3;
-
-    npc.userData.panic =
-        false;
-
-    npc.userData.panicTime =
-        0;
-
-    npc.userData.target =
-        null;
-
-    return npc;
-
-}
-
-
-/* ==========================================
-   SAFE NPC SPAWN
-========================================== */
-
-function spawnNPC(){
-
-    const npc =
-        createNPC();
-
-    let x;
-    let z;
-
-    const horizontal =
-        Math.random() <
-        .5;
-
-    const road =
-        roadPositions[
-            Math.floor(
-                Math.random() *
-                roadPositions.length
-            )
-        ];
-
-    if(horizontal){
-
-        x =
-            road +
-            (
-                Math.random()-.5
-            ) *
-            7;
-
-        z =
-            (
-                Math.random()-.5
-            ) *
-            WORLD_SIZE;
-
-    }
-    else{
-
-        x =
-            (
-                Math.random()-.5
-            ) *
-            WORLD_SIZE;
-
-        z =
-            road +
-            (
-                Math.random()-.5
-            ) *
-            7;
-
-    }
-
-    npc.position.set(
-        x,
-        0,
-        z
-    );
-
-    scene.add(
-        npc
-    );
-
-    npcs.push(
-        npc
-    );
-
-}
-
-
-/* ==========================================
-   INITIAL NPCS
-========================================== */
-
-for(
-    let i=0;
-    i<55;
-    i++
-){
-
-    spawnNPC();
-
-}
-
-
-/* ==========================================
-   NPC PANIC
-========================================== */
-
-function panicNearbyNPCs(){
-
-    npcs.forEach(
-        npc => {
-
-            const distance =
-                npc.position.distanceTo(
-                    playerGroup.position
-                );
-
-            if(
-                distance < 100
-            ){
-
-                npc.userData.panic =
-                    true;
-
-                npc.userData.panicTime =
-                    8;
-
-                const direction =
-                    new THREE.Vector3()
-                        .subVectors(
-                            npc.position,
-                            playerGroup.position
-                        );
-
-                direction.y =
-                    0;
-
-                if(
-                    direction.length() >
-                    .1
-                ){
-
-                    direction.normalize();
-
-                    npc.userData.target =
-                        npc.position.clone()
-                            .add(
-                                direction.multiplyScalar(
-                                    60
-                                )
-                            );
-
-                }
-
-            }
-
-        }
-    );
-
-}
-
-
-/* ==========================================
-   NPC MOVEMENT
-========================================== */
-
-function updateNPCs(
-    dt
-){
-
-    npcs.forEach(
-        npc => {
-
-            npc.userData.walkTime +=
-                dt *
-                npc.userData.speed *
-                3;
-
-            let direction =
-                new THREE.Vector3();
-
-
-            if(
-                npc.userData.panic &&
-                npc.userData.target
-            ){
-
-                npc.userData.panicTime -=
-                    dt;
-
-                direction
-                    .subVectors(
-                        npc.userData.target,
-                        npc.position
-                    );
-
-                if(
-                    npc.userData.panicTime <= 0 ||
-                    direction.length() < 5
-                ){
-
-                    npc.userData.panic =
-                        false;
-
-                }
-
-            }
-
-
-            if(
-                !npc.userData.panic
-            ){
-
-                const angle =
-                    Math.sin(
-                        npc.userData.walkTime*.15
-                    ) *
-                    Math.PI;
-
-                direction.set(
-                    Math.sin(angle),
-                    0,
-                    Math.cos(angle)
-                );
-
-            }
-
-
-            if(
-                direction.length() >
-                .05
-            ){
-
-                direction.normalize();
-
-                npc.position.add(
-                    direction.multiplyScalar(
-                        (
-                            npc.userData.panic
-                            ? 5
-                            : npc.userData.speed
-                        ) *
-                        dt
-                    )
-                );
-
-                npc.rotation.y =
-                    Math.atan2(
-                        direction.x,
-                        direction.z
-                    );
-
-            }
-
-
-            const swing =
-                Math.sin(
-                    npc.userData.walkTime
-                )*.45;
-
-            npc.userData.leftLeg
-                .rotation.x =
-                swing;
-
-            npc.userData.rightLeg
-                .rotation.x =
-                -swing;
-
-            npc.userData.leftArm
-                .rotation.x =
-                -swing*.7;
-
-            npc.userData.rightArm
-                .rotation.x =
-                swing*.7;
-
-
-            const limit =
-                WORLD_SIZE/2 - 5;
-
-            npc.position.x =
-                THREE.MathUtils.clamp(
-                    npc.position.x,
-                    -limit,
-                    limit
-                );
-
-            npc.position.z =
-                THREE.MathUtils.clamp(
-                    npc.position.z,
-                    -limit,
-                    limit
-                );
-
-        }
-    );
-
-}
-
-
-/* ==========================================
-   SHOPS
-========================================== */
-
-function createShop(
-    x,
-    z,
-    color,
-    name
-){
-
-    const group =
-        new THREE.Group();
-
-    const building =
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                18,
-                8,
-                14
-            ),
-            new THREE.MeshStandardMaterial({
-                color:color
-            })
-        );
-
-    building.position.y =
-        4;
-
-    building.castShadow =
-        true;
-
-    group.add(
-        building
-    );
-
-
-    const sign =
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                12,
-                2.5,
-                .25
-            ),
-            new THREE.MeshBasicMaterial({
-                color:0xffffff
-            })
-        );
-
-    sign.position.set(
-        0,
-        8,
-        -7.15
-    );
-
-    group.add(
-        sign
-    );
-
-
-    group.position.set(
-        x,
-        0,
-        z
-    );
-
-    scene.add(
-        group
-    );
-
-    shops.push({
-        object:group,
-        name:name
-    });
-
-}
-
-
-/*
-   Shops are placed beside roads,
-   never in the road itself.
-*/
-
-createShop(
-    -120,
-    -91,
-    0x455a64,
-    "CITY MARKET"
-);
-
-createShop(
-    120,
-    89,
-    0x6d4c41,
-    "AUTO SHOP"
-);
-
-createShop(
-    -120,
-    171,
-    0x3949ab,
-    "ELECTRONICS"
-);
-
-createShop(
-    200,
-    -169,
-    0x00897b,
-    "CAFE"
-);
-
-
-/* ==========================================
-   DISTRICTS
-========================================== */
-
-function getDistrict(
+/* =====================================================
+   CREATE CITY NAME
+===================================================== */
+
+function createCityName(
+    name,
     x,
     z
 ){
 
-    if(
-        Math.abs(x) < 120 &&
-        Math.abs(z) < 120
-    ){
-
-        return "DOWNTOWN";
-
-    }
+    const sprite=
+        createTextSprite(
+            name
+        );
 
 
-    if(
-        x < -120 &&
-        z < 120
-    ){
-
-        return "WESTSIDE";
-
-    }
+    sprite.position.set(
+        x,
+        1,
+        z
+    );
 
 
-    if(
-        x > 120 &&
-        z < 120
-    ){
-
-        return "EASTSIDE";
-
-    }
+    sprite.scale.set(
+        42,
+        8,
+        1
+    );
 
 
-    if(
-        x < -120 &&
-        z >= 120
-    ){
-
-        return "HARBOR";
-
-    }
-
-
-    if(
-        x >= 120 &&
-        z >= 120
-    ){
-
-        return "UPTOWN";
-
-    }
-
-
-    return "SUBURBS";
+    scene.add(
+        sprite
+    );
 
 }
 
 
-/* ==========================================
-   DISTRICT UPDATE
-========================================== */
+/* =====================================================
+   CITY DISTRICTS
+===================================================== */
 
-function updateDistrict(){
+createCityName(
+    "DOWNTOWN",
+    0,
+    0
+);
 
-    const position =
-        inCar
-        ? car.position
-        : playerGroup.position;
 
-    const district =
-        getDistrict(
-            position.x,
-            position.z
-        );
+createCityName(
+    "NORTH HILLS",
+    0,
+    300
+);
 
-    if(
-        district !== currentDistrict
-    ){
 
-        currentDistrict =
-            district;
+createCityName(
+    "SOUTH BEACH",
+    0,
+    -300
+);
 
-        document
-            .getElementById(
-                "districtHud"
-            )
-            .textContent =
-            district;
 
-        showDistrictNotification(
-            district
-        );
+createCityName(
+    "EAST SIDE",
+    300,
+    0
+);
 
-    }
 
-}
+createCityName(
+    "WEST END",
+    -300,
+    0
+);
 
 
-/* ==========================================
-   DISTRICT NOTIFICATION
-========================================== */
+createCityName(
+    "INDUSTRIAL DISTRICT",
+    300,
+    300
+);
 
-function showDistrictNotification(
-    district
-){
 
-    const element =
-        document.getElementById(
-            "districtNotification"
-        );
+createCityName(
+    "OLD TOWN",
+    -300,
+    300
+);
 
-    element.textContent =
-        district;
 
-    element.style.opacity =
-        "1";
+createCityName(
+    "AIRPORT DISTRICT",
+    300,
+    -300
+);
 
-    clearTimeout(
-        districtTimer
-    );
 
-    districtTimer =
-        setTimeout(
-            () => {
-
-                element.style.opacity =
-                    "0";
-
-            },
-            2500
-        );
-
-}
-
-
-/* ==========================================
-   CAMERA
-========================================== */
-
-function updateCamera(){
-
-    if(
-        inCar
-    ){
-
-        const target =
-            car.position.clone();
-
-        target.y +=
-            2.4;
-
-
-        const distance =
-            12;
-
-
-        const offset =
-            new THREE.Vector3(
-                0,
-                4.5,
-                distance
-            );
-
-
-        offset.applyAxisAngle(
-            new THREE.Vector3(
-                0,
-                1,
-                0
-            ),
-            car.rotation.y
-        );
-
-
-        camera.position.lerp(
-            target.clone().add(
-                offset
-            ),
-            .1
-        );
-
-
-        camera.lookAt(
-            target
-        );
-
-        return;
-
-    }
-
-
-    const target =
-        playerGroup.position.clone();
-
-    target.y +=
-        2.5;
-
-
-    const offset =
-        new THREE.Vector3(
-            0,
-            1.5,
-            7
-        );
-
-
-    offset.applyAxisAngle(
-        new THREE.Vector3(
-            1,
-            0,
-            0
-        ),
-        pitch
-    );
-
-
-    offset.applyAxisAngle(
-        new THREE.Vector3(
-            0,
-            1,
-            0
-        ),
-        yaw
-    );
-
-
-    const desired =
-        target.clone().add(
-            offset
-        );
-
-
-    camera.position.lerp(
-        desired,
-        .12
-    );
-
-
-    camera.lookAt(
-        target
-    );
-
-
-    if(
-        cameraShake > 0
-    ){
-
-        camera.position.x +=
-            (
-                Math.random()-.5
-            ) *
-            cameraShake;
-
-        camera.position.y +=
-            (
-                Math.random()-.5
-            ) *
-            cameraShake;
-
-        camera.position.z +=
-            (
-                Math.random()-.5
-            ) *
-            cameraShake;
-
-    }
-
-}
-
-
-/* ==========================================
-   CAMERA SHAKE
-========================================== */
-
-function addCameraShake(
-    amount
-){
-
-    cameraShake =
-        Math.max(
-            cameraShake,
-            amount
-        );
-
-}
-
-
-/* ==========================================
+/* =====================================================
    MINIMAP
-========================================== */
+===================================================== */
 
-const minimap =
-    document.getElementById(
-        "minimap"
+const minimapCanvas=
+    document.createElement(
+        "canvas"
     );
 
-const mapCtx =
-    minimap.getContext(
+
+minimapCanvas.width=240;
+
+minimapCanvas.height=240;
+
+
+minimapCanvas.style.position=
+    "fixed";
+
+
+minimapCanvas.style.right=
+    "20px";
+
+
+minimapCanvas.style.bottom=
+    "20px";
+
+
+minimapCanvas.style.width=
+    "240px";
+
+
+minimapCanvas.style.height=
+    "240px";
+
+
+minimapCanvas.style.border=
+    "3px solid white";
+
+
+minimapCanvas.style.borderRadius=
+    "50%";
+
+
+minimapCanvas.style.background=
+    "#18202a";
+
+
+minimapCanvas.style.zIndex=
+    "999";
+
+
+document.body.appendChild(
+    minimapCanvas
+);
+
+
+const minimapContext=
+    minimapCanvas.getContext(
         "2d"
     );
 
 
-function drawMinimap(){
+/* =====================================================
+   MINIMAP DRAW
+===================================================== */
 
-    const width =
-        minimap.width;
+function updateMinimap(){
 
-    const height =
-        minimap.height;
+    if(
+        !playerGroup ||
+        !camera
+    ){
+
+        return;
+
+    }
 
 
-    mapCtx.clearRect(
+    const ctx=
+        minimapContext;
+
+
+    const width=
+        minimapCanvas.width;
+
+
+    const height=
+        minimapCanvas.height;
+
+
+    ctx.clearRect(
         0,
         0,
         width,
@@ -4620,10 +4474,11 @@ function drawMinimap(){
     );
 
 
-    mapCtx.fillStyle =
-        "#203824";
+    ctx.fillStyle=
+        "#17202b";
 
-    mapCtx.fillRect(
+
+    ctx.fillRect(
         0,
         0,
         width,
@@ -4631,428 +4486,245 @@ function drawMinimap(){
     );
 
 
-    const scale =
-        width /
-        WORLD_SIZE;
+    const centerX=
+        width/2;
 
 
-    /* roads */
-
-    mapCtx.fillStyle =
-        "#454545";
+    const centerY=
+        height/2;
 
 
-    roadPositions.forEach(
-        road => {
-
-            const p =
-                (road +
-                WORLD_SIZE/2) *
-                scale;
+    const scale=
+        .25;
 
 
-            mapCtx.fillRect(
-                0,
-                p - 3,
-                width,
-                6
-            );
+    /* ROADS */
+
+    ctx.strokeStyle=
+        "#626b75";
 
 
-            mapCtx.fillRect(
-                p - 3,
-                0,
-                6,
-                height
-            );
-
-        }
-    );
+    ctx.lineWidth=
+        10;
 
 
-    /* player */
-
-    const position =
-        inCar
-        ? car.position
-        : playerGroup.position;
+    const roads=
+        [-360,-180,0,180,360];
 
 
-    const px =
-        (
-            position.x +
-            WORLD_SIZE/2
-        ) *
-        scale;
-
-
-    const pz =
-        (
-            position.z +
-            WORLD_SIZE/2
-        ) *
-        scale;
-
-
-    mapCtx.fillStyle =
-        "#28d34f";
-
-
-    mapCtx.beginPath();
-
-    mapCtx.arc(
-        px,
-        pz,
-        5,
-        0,
-        Math.PI*2
-    );
-
-    mapCtx.fill();
-
-
-    /* police */
-
-    mapCtx.fillStyle =
-        "#ff3333";
-
-
-    policeCars.forEach(
-        police => {
-
-            const x =
-                (
-                    police.position.x +
-                    WORLD_SIZE/2
-                ) *
-                scale;
-
-            const z =
-                (
-                    police.position.z +
-                    WORLD_SIZE/2
-                ) *
-                scale;
-
-            mapCtx.fillRect(
-                x-2,
-                z-2,
-                4,
-                4
-            );
-
-        }
-    );
-
-}
-
-
-/* ==========================================
-   MISSION SYSTEM
-========================================== */
-
-const missions = [
-
-    {
-        title:
-            "Explore Downtown",
-
-        reward:
-            500
-    },
-
-    {
-        title:
-            "Visit the Auto Shop",
-
-        reward:
-            750
-    },
-
-    {
-        title:
-            "Reach the Harbor",
-
-        reward:
-            1000
-    },
-
-    {
-        title:
-            "Lose the Police",
-
-        reward:
-            1500
-    }
-
-];
-
-
-function updateMission(){
-
-    const mission =
-        missions[
-            activeMission
-        ];
-
-
-    if(
-        !mission
+    for(
+        const road of roads
     ){
 
-        document
-            .getElementById(
-                "mission"
-            )
-            .textContent =
-            "All missions completed!";
+        const px=
+            centerX+
+            (
+                road-
+                playerGroup.position.x
+            )*
+            scale;
 
-        return;
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+            px,
+            0
+        );
+
+
+        ctx.lineTo(
+            px,
+            height
+        );
+
+
+        ctx.stroke();
+
+
+        const pz=
+            centerY+
+            (
+                road-
+                playerGroup.position.z
+            )*
+            scale;
+
+
+        ctx.beginPath();
+
+
+        ctx.moveTo(
+            0,
+            pz
+        );
+
+
+        ctx.lineTo(
+            width,
+            pz
+        );
+
+
+        ctx.stroke();
 
     }
 
 
-    document
-        .getElementById(
-            "mission"
-        )
-        .textContent =
-        "Mission: " +
-        mission.title;
+    /* SHOPS */
 
-}
+    ctx.fillStyle=
+        "#ffb400";
 
 
-/* ==========================================
-   MISSION CHECK
-========================================== */
-
-function checkMission(){
-
-    const position =
-        inCar
-        ? car.position
-        : playerGroup.position;
-
-
-    if(
-        activeMission === 0 &&
-        currentDistrict ===
-        "DOWNTOWN"
+    for(
+        const shop of
+        shops
     ){
 
-        completeMission();
+        const x=
+            centerX+
+            (
+                shop.position.x-
+                playerGroup.position.x
+            )*
+            scale;
+
+
+        const y=
+            centerY+
+            (
+                shop.position.z-
+                playerGroup.position.z
+            )*
+            scale;
 
-    }
-
-
-    if(
-        activeMission === 1 &&
-        position.distanceTo(
-            new THREE.Vector3(
-                120,
-                0,
-                89
-            )
-        ) < 30
-    ){
-
-        completeMission();
-
-    }
-
-
-    if(
-        activeMission === 2 &&
-        currentDistrict ===
-        "HARBOR"
-    ){
-
-        completeMission();
-
-    }
-
-
-    if(
-        activeMission === 3 &&
-        wantedLevel === 0
-    ){
-
-        completeMission();
-
-    }
-
-}
-
-
-/* ==========================================
-   COMPLETE MISSION
-========================================== */
-
-function completeMission(){
-
-    if(
-        missionCompleted
-    ){
-
-        return;
-
-    }
-
-
-    missionCompleted =
-        true;
-
-
-    const mission =
-        missions[
-            activeMission
-        ];
-
-
-    money +=
-        mission.reward;
-
-
-    document
-        .getElementById(
-            "money"
-        )
-        .textContent =
-        "$" +
-        money.toLocaleString();
-
-
-    showMessage(
-        "MISSION COMPLETE +$" +
-        mission.reward
-    );
-
-
-    activeMission++;
-
-
-    setTimeout(
-        () => {
-
-            missionCompleted =
-                false;
-
-            updateMission();
-
-        },
-        2500
-    );
-
-}
-
-
-/* ==========================================
-   COLLISION / DAMAGE
-========================================== */
-
-function checkVehicleCollisions(){
-
-    if(
-        !inCar
-    ){
-
-        return;
-
-    }
-
-
-    trafficCars.forEach(
-        traffic => {
-
-            const distance =
-                car.position.distanceTo(
-                    traffic.position
-                );
-
-
-            if(
-                distance < 5
-            ){
-
-                if(
-                    damageCooldown <= 0
-                ){
-
-                    playerHealth -=
-                        8;
-
-                    damageCooldown =
-                        .7;
-
-                    carSpeed *=
-                        .55;
-
-                    updateHealthUI();
-
-                    addCameraShake(
-                        .35
-                    );
-
-                    showMessage(
-                        "Vehicle collision"
-                    );
-
-                }
-
-            }
-
-        }
-    );
-
-}
-
-
-/* ==========================================
-   DAMAGE TIMER
-========================================== */
-
-function updateDamage(
-    dt
-){
-
-    if(
-        damageCooldown > 0
-    ){
-
-        damageCooldown -=
-            dt;
-
-    }
-
-
-    if(
-        cameraShake > 0
-    ){
-
-        cameraShake *=
-            .85;
 
         if(
-            cameraShake <
-            .01
+            x>0 &&
+            x<width &&
+            y>0 &&
+            y<height
         ){
 
-            cameraShake =
-                0;
+            ctx.beginPath();
+
+            ctx.arc(
+                x,
+                y,
+                5,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fill();
 
         }
 
     }
 
+
+    /* MISSION */
+
+    if(
+        missionMarker
+    ){
+
+        const x=
+            centerX+
+            (
+                missionMarker.position.x-
+                playerGroup.position.x
+            )*
+            scale;
+
+
+        const y=
+            centerY+
+            (
+                missionMarker.position.z-
+                playerGroup.position.z
+            )*
+            scale;
+
+
+        ctx.fillStyle=
+            "#ffd000";
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y,
+            7,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    /* PLAYER */
+
+    ctx.save();
+
+
+    ctx.translate(
+        centerX,
+        centerY
+    );
+
+
+    ctx.rotate(
+        -playerGroup.rotation.y
+    );
+
+
+    ctx.fillStyle=
+        "#00ff75";
+
+
+    ctx.beginPath();
+
+
+    ctx.moveTo(
+        0,
+        -11
+    );
+
+
+    ctx.lineTo(
+        7,
+        8
+    );
+
+
+    ctx.lineTo(
+        -7,
+        8
+    );
+
+
+    ctx.closePath();
+
+
+    ctx.fill();
+
+
+    ctx.restore();
+
 }
 
 
-/* ==========================================
-   DAY / NIGHT
-========================================== */
+/* =====================================================
+   DAY / NIGHT CYCLE
+===================================================== */
 
-let worldTime =
+let worldTime=
     8;
 
 
@@ -5060,302 +4732,268 @@ function updateDayNight(
     dt
 ){
 
-    worldTime +=
-        dt *
-        .015;
+    worldTime+=
+        dt*.35;
 
 
     if(
-        worldTime >= 24
+        worldTime>=24
     ){
 
-        worldTime =
-            0;
+        worldTime-=24;
 
     }
 
 
-    const sunAngle =
+    const sunAngle=
         (
-            worldTime -
-            6
-        ) /
-        24 *
+            worldTime/
+            24
+        )*
         Math.PI*2;
 
 
-    sun.position.x =
-        Math.cos(
-            sunAngle
-        ) *
-        350;
+    if(
+        typeof sunLight!=="undefined"
+    ){
+
+        sunLight.position.x=
+            Math.cos(
+                sunAngle
+            )*
+            500;
 
 
-    sun.position.y =
-        Math.sin(
-            sunAngle
-        ) *
-        350;
+        sunLight.position.y=
+            Math.sin(
+                sunAngle
+            )*
+            500;
 
 
-    sun.position.z =
-        150;
+        sunLight.position.z=
+            100;
+
+    }
+
+
+    const night=
+        worldTime<6 ||
+        worldTime>19;
 
 
     if(
-        worldTime >= 18 ||
-        worldTime < 6
+        typeof renderer!=="undefined"
     ){
 
-        scene.background.set(
-            0x10182d
+        renderer.setClearColor(
+            night
+            ? 0x07111e
+            : 0x8fc7e8
         );
-
-        scene.fog.color.set(
-            0x10182d
-        );
-
-        ambientLight.intensity =
-            .45;
-
-        sun.intensity =
-            .45;
 
     }
-    else{
 
-        scene.background.set(
-            0x87b9df
+
+    if(
+        typeof scene!=="undefined"
+    ){
+
+        scene.fog=
+            scene.fog ||
+            new THREE.Fog(
+                0x8fc7e8,
+                300,
+                1500
+            );
+
+
+        scene.fog.color.setHex(
+            night
+            ? 0x07111e
+            : 0x8fc7e8
         );
-
-        scene.fog.color.set(
-            0x87b9df
-        );
-
-        ambientLight.intensity =
-            1.7;
-
-        sun.intensity =
-            2;
 
     }
 
 }
 
 
-/* ==========================================
-   LOADING
-========================================== */
+/* =====================================================
+   CAMERA FOLLOW
+===================================================== */
 
-let loadingProgress =
-    0;
-
-
-const loadingInterval =
-    setInterval(
-        () => {
-
-            loadingProgress +=
-                Math.random()*12;
-
-
-            if(
-                loadingProgress >= 100
-            ){
-
-                loadingProgress =
-                    100;
-
-                clearInterval(
-                    loadingInterval
-                );
-
-
-                document
-                    .getElementById(
-                        "loadingProgress"
-                    )
-                    .style.width =
-                    "100%";
-
-
-                setTimeout(
-                    () => {
-
-                        document
-                            .getElementById(
-                                "loading"
-                            )
-                            .style.display =
-                            "none";
-
-
-                        document
-                            .getElementById(
-                                "startScreen"
-                            )
-                            .style.display =
-                            "flex";
-
-                    },
-                    500
-                );
-
-            }
-
-
-            document
-                .getElementById(
-                    "loadingProgress"
-                )
-                .style.width =
-                loadingProgress +
-                "%";
-
-
-        },
-        120
-    );
-
-
-/* ==========================================
-   GAME LOOP
-========================================== */
-
-const clock =
-    new THREE.Clock();
-
-
-function animate(){
-
-    requestAnimationFrame(
-        animate
-    );
-
-
-    const dt =
-        Math.min(
-            clock.getDelta(),
-            .05
-        );
-
+function updateOpenWorldCamera(){
 
     if(
-        gameStarted
+        !camera
     ){
 
-        updatePlayer(
-            dt
-        );
-
-        updatePlayerCar(
-            dt
-        );
-
-        updateTraffic(
-            dt
-        );
-
-        updateNPCs(
-            dt
-        );
-
-        updatePolice(
-            dt
-        );
-
-        updateWantedDecay(
-            dt
-        );
-
-        updateDamage(
-            dt
-        );
-
-        updateDistrict();
-
-        checkMission();
-
-        checkVehicleCollisions();
-
-        updateDayNight(
-            dt
-        );
+        return;
 
     }
 
 
-    updateCamera();
+    const target=
+        inCar
+        ? car
+        : playerGroup;
 
-    drawMinimap();
+
+    if(
+        !target
+    ){
+
+        return;
+
+    }
 
 
-    renderer.render(
-        scene,
-        camera
+    const desired=
+        new THREE.Vector3(
+            0,
+            inCar
+            ? 7
+            : 6,
+            inCar
+            ? 13
+            : 11
+        );
+
+
+    desired.applyQuaternion(
+        target.quaternion
+    );
+
+
+    desired.add(
+        target.position
+    );
+
+
+    camera.position.lerp(
+        desired,
+        .08
+    );
+
+
+    camera.lookAt(
+        target.position.x,
+        target.position.y+1.8,
+        target.position.z
     );
 
 }
 
 
-animate();
+/* =====================================================
+   WORLD UPDATE
+===================================================== */
 
+function updateStage8(
+    dt
+){
 
-/* ==========================================
-   RESIZE
-========================================== */
+    if(
+        !gameStarted
+    ){
 
-window.addEventListener(
-    "resize",
-    () => {
-
-        camera.aspect =
-            window.innerWidth /
-            window.innerHeight;
-
-
-        camera.updateProjectionMatrix();
-
-
-        renderer.setSize(
-            window.innerWidth,
-            window.innerHeight
-        );
+        return;
 
     }
-);
 
 
-/* ==========================================
-   INITIAL UI
-========================================== */
-
-updateHealthUI();
-updateAmmoUI();
-updateWantedUI();
-updateMission();
+    updateNPCs(
+        dt
+    );
 
 
-/* ==========================================
-   ESCAPE POINTER LOCK
-========================================== */
+    updateTraffic(
+        dt
+    );
+
+
+    checkTrafficCollision();
+
+
+    updateTrafficLights(
+        dt
+    );
+
+
+    updatePolice(
+        dt
+    );
+
+
+    updateWanted(
+        dt
+    );
+
+
+    updateMission();
+
+
+    updateShops();
+
+
+    updateDayNight(
+        dt
+    );
+
+
+    updateMinimap();
+
+
+    updateOpenWorldCamera();
+
+}
+
+
+/* =====================================================
+   ADD TO MAIN GAME LOOP
+===================================================== */
+
+const previousStage8Loop=
+    typeof animate==="function"
+    ? animate
+    : null;
+
+
 
 window.addEventListener(
     "keydown",
-    event => {
+    event=>{
 
         if(
-            event.code ===
-            "Escape"
+            !gameStarted
         ){
 
-            if(
-                document.pointerLockElement
-            ){
+            return;
 
-                document.exitPointerLock();
+        }
 
-            }
+
+        if(
+            event.code==="KeyM"
+        ){
+
+            startMission();
+
+        }
+
+
+        if(
+            event.code==="KeyP"
+        ){
+
+            increaseWanted(
+                1
+            );
+
+            showMessage(
+                "Police alerted!"
+            );
 
         }
 
@@ -5363,12 +5001,27 @@ window.addEventListener(
 );
 
 
-/* ==========================================
-   FINAL HTML CLOSING
-========================================== */
 
+
+setTimeout(
+    ()=>{
+
+        updateMoneyUI();
+
+        updateWantedUI();
+
+        if(
+            !missionActive
+        ){
+
+            startMission();
+
+        }
+
+    },
+    1200
+);
 </script>
 
 </body>
-
 </html>
